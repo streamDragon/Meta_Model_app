@@ -18,13 +18,17 @@ function next(){
 function type(label:string,value:string){
   fireEvent.change(screen.getByLabelText(label,{exact:false}),{target:{value}});
 }
-function intro(){render(<BridgePage/>);next();}
+function intro(){
+  render(<BridgePage/>);
+  expect(screen.getByRole('heading',{name:/כוס נשברת במטבח/})).toBeTruthy();
+  expect(screen.queryByRole('progressbar')).toBeNull();
+  fireEvent.click(within(screen.getByRole('group',{name:'מה אתה עושה עכשיו?'})).getAllByRole('button')[0]);
+  expect(screen.getByText(/יוסי עדיין עומד ליד השברים/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:/ממשיך מכאן/}));
+}
 function goToBody(){
   intro();
-  type('מצד אחד','לכבד את אבא שלי');
-  type('ומצד שני','להיות האבא שאני רוצה להיות לילדים');
-  type('מתי זה הכי מושך','כשאבא מתקשר בערב');
-  next();
+  // A chosen story fills the context and draft values. The learner can edit them.
   type('מה חשוב לך ב־לכבד את אבא שלי','כבוד והכרת תודה');
   type('מה חשוב לך ב־להיות האבא','סבלנות ורוגע');
   next();
@@ -81,13 +85,36 @@ describe('The Bridge - guided mobile flow',()=>{
    expect((document.getElementById('bridge-name') as HTMLInputElement).value).toContain('וגם');
  });
  it('stops on risk words and prevents following steps',()=>{
-   intro();
+   render(<BridgePage/>);
+   fireEvent.click(screen.getByRole('button',{name:'סיפור משלי'}));
    type('מצד אחד','אני מתכוון להתאבד');
    type('ומצד שני','לנוח');
    expect(screen.getByText('עוצרים כאן.')).toBeTruthy();
    expect((screen.getByRole('button',{name:'המשך'}) as HTMLButtonElement).disabled).toBe(true);
  });
- it('surfaces day-1 card review without another app',()=>{
+ it('keeps gender settings and help in an overlay, never an onboarding form',()=>{
+   render(<BridgePage/>);
+   expect(screen.queryByRole('progressbar')).toBeNull();
+   expect(screen.queryByRole('group',{name:'איך לפנות אליך?'})).toBeNull();
+   fireEvent.click(screen.getByRole('button',{name:'עזרה והגדרות'}));
+   const dialog=screen.getByRole('dialog',{name:'איך הגשר עובד?'});
+   fireEvent.click(within(dialog).getByRole('button',{name:'את'}));
+   expect(within(dialog).getByRole('button',{name:'את'}).getAttribute('aria-pressed')).toBe('true');
+   fireEvent.click(within(dialog).getByRole('button',{name:'סגירת העזרה'}));
+   expect(screen.queryByRole('dialog')).toBeNull();
+   expect(screen.getByRole('heading',{name:/כוס נשברת במטבח/})).toBeTruthy();
+ });
+ it('lets a beginner choose another story without typing or a progress meter',()=>{
+   render(<BridgePage/>);
+   fireEvent.click(screen.getByRole('button',{name:/סיפור אחר/}));
+   expect(screen.getByRole('heading',{name:/הבטחת שתגיע הביתה/})).toBeTruthy();
+   fireEvent.click(within(screen.getByRole('group',{name:'מה אתה עושה עכשיו?'})).getAllByRole('button')[1]);
+   fireEvent.click(screen.getByRole('button',{name:/ממשיך מכאן/}));
+   expect(screen.getByRole('heading',{name:'מה חשוב לך כאן?'})).toBeTruthy();
+   expect((document.getElementById('bridge-value-a') as HTMLInputElement).value.length).toBeGreaterThan(0);
+   expect(screen.queryByRole('progressbar')).toBeNull();
+ });
+  it('surfaces day-1 card review without another app',()=>{
    const d={...newBridgeDraft(),step:9,chosenName:'שם חדש',sideA:'משפחה',sideB:'עבודה'};
    const card=makeBridgeCard(d,new Date(Date.now()-2*86400000));
    saveBridgeCard(card);

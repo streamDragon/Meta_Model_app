@@ -40,7 +40,7 @@ const moshe={
  difference:'אני פחות ממהר להתגונן ויותר מסוגל להקשיב',
  nextAction:'לעצור לרגע לפני השיחה הבאה עם אבא',
 };
-const steps=[1,5,7,9];
+const steps=[0,1,2,5,7,9];
 for(const step of steps){
   const value={...moshe,step};
   const code='localStorage.setItem("wisdom:bridge:draft:v1",'+JSON.stringify(JSON.stringify(value))+');';
@@ -48,8 +48,8 @@ for(const step of steps){
   if(a.exceptionDetails)throw Error('localStorage injection failed');
   await call('Page.reload',{ignoreCache:true});
   await pause(950);
-  const check=await call('Runtime.evaluate',{expression:"document.querySelector('.bridge-progress-meta')?.innerText",returnByValue:true});
-  if(!String(check.result?.value).includes(String(step+1)))throw new Error('QA wrong step '+step+': '+check.result?.value);
+  const check=await call('Runtime.evaluate',{expression:"document.querySelector('.bridge-stage')?.getAttribute('aria-label')",returnByValue:true});
+  if(!check.result?.value || (step===0 && !check.result?.value.includes('מתחילים')))throw new Error('QA missing stage '+step+': '+check.result?.value);
   const image=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,fromSurface:true});
   const name='bridge_step_'+step+'_390px.png';
   fs.writeFileSync(path.join(dst,name),Buffer.from(image.data,'base64'));

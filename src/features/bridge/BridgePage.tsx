@@ -18,6 +18,79 @@ const EXAMPLES=[
   ['להשקיע בעבודה','להיות פנוי למשפחה','כשמגיעה בקשה חדשה מהעבודה'],
   ['לומר את האמת','לשמור על השלום','כשמישהו שואל אותי שאלה לא נוחה'],
 ] as const;
+
+const ENTRY_STORIES = [
+  {
+    id: 'family', scene: 'ערב בבית', icon: '🏠',
+    opening: 'כוס נשברת במטבח. יוסי עומד ליד השברים. בדיוק אבא שלך מתקשר.',
+    speakerA: 'אבא בטלפון', lineA: 'אמרתי לך, אתה רך מדי עם הילדים.',
+    speakerB: 'יוסי, ליד הכוס', lineB: 'אבא, אני מפחד. תבוא?',
+    sideA: 'לכבד את אבא שלי',
+    sideB: 'להיות האבא שאני רוצה להיות לילדים',
+    valueA: 'לשמור על הקשר והכבוד עם אבא',
+    valueB: 'לתת ליוסי להרגיש שאני כאן בשבילו',
+    trigger: 'כשאבא מעיר לי בזמן שיוסי צריך אותי',
+  },
+  {
+    id: 'work', scene: 'שש בערב', icon: '🕕',
+    opening: 'כבר הבטחת שתגיע הביתה מוקדם. הטלפון רוטט.',
+    speakerA: 'המנהל', lineA: 'יש משהו דחוף. תוכל להישאר?',
+    speakerB: 'בבית', lineB: 'מחכים לך. הבטחת.',
+    sideA: 'לעמוד במחויבויות שלי בעבודה',
+    sideB: 'להיות פנוי למשפחה',
+    valueA: 'להיות מישהו שאפשר לסמוך עליו בעבודה',
+    valueB: 'לקיים את מה שהבטחתי למשפחה',
+    trigger: 'כשהעבודה מבקשת ממני להישאר בזמן שמחכים לי בבית',
+  },
+  {
+    id: 'honesty', scene: 'שיחה עם חברה', icon: '💬',
+    opening: 'היא מספרת לך על החלטה שעשתה. יש לך ספקות.',
+    speakerA: 'החברה', lineA: 'תגיד לי בכנות. מה דעתך?',
+    speakerB: 'בתוכך', lineB: 'אני לא רוצה לפגוע בה.',
+    sideA: 'להגיד את האמת',
+    sideB: 'לשמור על הקשר והרגישות',
+    valueA: 'להיות כן עם האנשים שחשובים לי',
+    valueB: 'להגן על החברות שלנו',
+    trigger: 'כשחברה מבקשת ממני לומר משהו שעלול לפגוע בה',
+  },
+] as const;
+
+
+// There is no right/wrong button here. Each choice reveals a real human cost
+// before introducing the idea that both values deserve attention.
+const STORY_CHOICES = [
+  [
+    {
+      label: 'אני ממשיך להקשיב לאבא.',
+      result: 'אבא ממשיך לדבר. יוסי עדיין עומד ליד השברים ומחכה לך.',
+    },
+    {
+      label: 'אני ניגש ליוסי ומסיים את השיחה.',
+      result: 'יוסי נרגע קצת. אתה חושב על אבא ועל מה שקרה ביניכם.',
+    },
+  ],
+  [
+    {
+      label: 'אני נשאר בעבודה.',
+      result: 'המנהל נושם לרווחה. בבית מחכים, ואתה יודע שהבטחת להגיע.',
+    },
+    {
+      label: 'אני אומר למנהל שאני יוצא.',
+      result: 'בבית שמחים. בעבודה נשאר עניין חשוב שלא מצאת לו פתרון.',
+    },
+  ],
+  [
+    {
+      label: 'אני אומר את מה שאני באמת חושב.',
+      result: 'אמרת את האמת. עכשיו אתה רואה שהחברה שלך נפגעה.',
+    },
+    {
+      label: 'אני מעדן את התשובה כדי לא לפגוע.',
+      result: 'השיחה נשארת נעימה. בפנים אתה מרגיש שלא אמרת הכול.',
+    },
+  ],
+] as const;
+
 const SENSATIONS: Array<{id:BodySensation;name:string}>=[
   {id:'breath',name:'נשימה עמוקה יותר'}, {id:'chest',name:'רוגע בחזה'},
   {id:'warmth',name:'חום'}, {id:'tears',name:'דמעות'}, {id:'smile',name:'חיוך'},
@@ -74,12 +147,27 @@ export function BridgePage() {
   const [reviewAction,setReviewAction]=useState<'yes'|'no'|'not-yet'>('not-yet');
   const [copyNote,setCopyNote]=useState('');
   const [confirmDelete,setConfirmDelete]=useState(false);
+  const [storyIndex,setStoryIndex]=useState(0);
+  const [storyChoice,setStoryChoice]=useState<number|null>(null);
+  const [showHelp,setShowHelp]=useState(false);
+  const helpTrigger=useRef<HTMLButtonElement|null>(null);
+  const helpClose=useRef<HTMLButtonElement|null>(null);
   const top=useRef<HTMLDivElement|null>(null);
   const suppressNextSave=useRef(false);
   const risk=bridgeRisk(draft);
   const forms=ADDRESS_FORMS[draft.address];
   const due=dueBridgeReviews(cards);
   const chosenCard=cards.find(c=>c.id===savedId);
+  const story=ENTRY_STORIES[storyIndex];
+  useEffect(()=>{
+    if(!showHelp)return;
+    const before=document.body.style.overflow;
+    document.body.style.overflow='hidden';
+    helpClose.current?.focus();
+    const onKey=(event:KeyboardEvent)=>{ if(event.key==='Escape') setShowHelp(false); };
+    document.addEventListener('keydown',onKey);
+    return ()=>{ document.body.style.overflow=before; document.removeEventListener('keydown',onKey); helpTrigger.current?.focus(); };
+  },[showHelp]);
 
   useEffect(()=>{
     const update=()=>setCards(loadBridgeCards());
@@ -102,6 +190,20 @@ export function BridgePage() {
     try{top.current?.scrollIntoView({behavior:'smooth',block:'start'});}catch{ /* tests/older browsers */ }
   },[draft.step,review]);
 
+  const startStory=(choice:typeof ENTRY_STORIES[number])=>{
+    setStoryChoice(null);
+    setDraft(current=>({
+      ...newBridgeDraft(),address:current.address,mode:current.mode,
+      step:2,sideA:choice.sideA,sideB:choice.sideB,
+      valueA:choice.valueA,valueB:choice.valueB,trigger:choice.trigger,
+    }));
+    setSavedId(null);
+    setShowOffers(false);
+  };
+  const writeOwnStory=()=>{
+    setStoryChoice(null);
+    update({step:1,sideA:'',sideB:'',valueA:'',valueB:'',trigger:''});
+  };
   const update=(patch:Partial<BridgeDraft>)=>{setDraft(old=>({...old,...patch}));setSavedId(null);setCopyNote('');};
   const side=(i:BridgeSide)=>sideLabel(i,draft);
   const value=(i:BridgeSide)=>valueLabel(i,draft);
@@ -178,32 +280,50 @@ export function BridgePage() {
   const renderStep=()=>{
     switch(draft.step){
       case 0:return <>
-        <div className="bridge-intro-illustration" aria-hidden="true"><span>או</span><span>↝</span><strong>וגם</strong></div>
-        <h2>כשנראה שצריך לבחור בין שני דברים חשובים</h2>
-        <p className="bridge-intro">בשבע דקות בערך ניתן לכל צד מקום, ניזכר ברגעים אמיתיים ונבדוק אם אפשר למצוא דרך שמכבדת את שניהם.</p>
-        <fieldset className="bridge-fieldset"><legend>איך לפנות אליך?</legend>
-          <div className="bridge-options">
-            {([['f','את'],['m','אתה'],['pl','אתם']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={draft.address===v} onClick={()=>update({address:v})}>{label}</button>)}
+        <div className="bridge-story-scene" data-testid="bridge-story">
+          <div className="bridge-story-location"><span aria-hidden="true">{story.icon}</span><span>{story.scene}</span></div>
+          <h2>{story.opening}</h2>
+          <div className="bridge-dialogue">
+            <div className="bridge-speech bridge-speech-first">
+              <span className="bridge-speaker">{story.speakerA}</span>
+              <p>״{story.lineA}״</p>
+            </div>
+            <div className="bridge-speech bridge-speech-second">
+              <span className="bridge-speaker">{story.speakerB}</span>
+              <p>״{story.lineB}״</p>
+            </div>
           </div>
-        </fieldset>
-        <fieldset className="bridge-fieldset"><legend>איך להשתמש בתרגול?</legend>
-          <div className="bridge-options">
-            <button type="button" aria-pressed={draft.mode==='self'} onClick={()=>update({mode:'self'})}>לעצמי</button>
-            <button type="button" aria-pressed={draft.mode==='practitioner'} onClick={()=>update({mode:'practitioner'})}>עם מטופל או מתאמן</button>
+          <div className="bridge-story-decision">
+            <h3>מה אתה עושה עכשיו?</h3>
+            <div className="bridge-story-options" role="group" aria-label="מה אתה עושה עכשיו?">
+              {STORY_CHOICES[storyIndex].map((option,index)=>
+                <button type="button" key={index} aria-pressed={storyChoice===index} onClick={()=>setStoryChoice(index)}>
+                  <span>{option.label}</span><span className="bridge-option-arrow" aria-hidden="true">←</span>
+                </button>)}
+            </div>
           </div>
-        </fieldset>
-        <p className="bridge-privacy">🔒 הטקסט נשמר רק בדפדפן הזה ולא נשלח למודל AI. אפשר למחוק הכול בכל רגע. השתמשו בדוגמאות בדויות או בלי פרטים מזהים.</p>
-        <p className="bridge-disclaimer">כלי תרגול לקונפליקטים יומיומיים, לא טיפול ולא סיוע במשבר. במצב של סכנה או מצוקה חריפה יש לפנות לאיש מקצוע או לשירותי חירום.</p>
-        {due.length>0&&<div className="bridge-due" aria-label="חזרות שממתינות"><strong>גשרים לחזרה</strong>
-          {due.slice(0,3).map((entry)=><button key={entry.card.id+'-'+entry.day} type="button" onClick={()=>startReview(entry)}>יום {entry.day} · {entry.card.draft.chosenName||'הגשר שלי'}</button>)}
+          {storyChoice!==null&&
+            <div className="bridge-story-result" role="status">
+              <p>{STORY_CHOICES[storyIndex][storyChoice].result}</p>
+              <button type="button" className="bridge-enter-story" onClick={()=>startStory(story)}>
+                ממשיך מכאן <span aria-hidden="true">←</span>
+              </button>
+            </div>}
+        </div>
+        <div className="bridge-story-switch">
+          <button type="button" onClick={()=>{setStoryIndex(i=>(i+1)%ENTRY_STORIES.length);setStoryChoice(null);}}>סיפור אחר <span aria-hidden="true">↻</span></button>
+          <button type="button" onClick={writeOwnStory}>סיפור משלי</button>
+        </div>
+        {due.length>0&&<div className="bridge-due" aria-label="חזרות שממתינות">
+          <strong>הגשרים שלי</strong>
+          {due.slice(0,3).map(entry=><button key={entry.card.id+'-'+entry.day} type="button" onClick={()=>startReview(entry)}>חזרה · יום {entry.day} · {entry.card.draft.chosenName||'הגשר שלי'}</button>)}
         </div>}
         {cards.length>0&&<details className="bridge-archive"><summary>הכרטיסים שלי ({cards.length})</summary>
-          {cards.map(card=><p key={card.id}>{card.draft.chosenName||'גשר ללא שם'} · נשמר {new Date(card.savedAt).toLocaleDateString('he-IL')}</p>)}
+          {cards.map(card=><p key={card.id}>{card.draft.chosenName||'גשר ללא שם'} · {new Date(card.savedAt).toLocaleDateString('he-IL')}</p>)}
         </details>}
       </>;
       case 1:return <>
-        <h2>מה הם שני הדברים שנראה שאי אפשר את שניהם?</h2>
-        <p>שני דברים שחשובים לך, לא שני אנשים שצריך לבחור ביניהם.</p>
+        <h2>מה שני הדברים שמושכים אותך?</h2>
         <Field id="bridge-side-a" label="מצד אחד" value={draft.sideA} onChange={v=>update({sideA:v})} required placeholder="לכבד את אבא שלי"/>
         <div className="bridge-or" aria-hidden="true">או</div>
         <Field id="bridge-side-b" label="ומצד שני" value={draft.sideB} onChange={v=>update({sideB:v})} required placeholder="להיות הורה סבלני"/>
@@ -213,16 +333,15 @@ export function BridgePage() {
         </div>
       </>;
       case 2:return <>
-        <h2>לכל צד יש מקום</h2>
-        <p className="bridge-kindness">שני הצדדים הגיוניים. אף אחד מהם לא טועה.</p>
+        <h2>מה חשוב לך כאן?</h2>
+        <p className="bridge-personal-prompt">אלה רק הצעות. שנה אותן למילים שלך אם צריך.</p>
         <div className="bridge-dual">
-          <div className="bridge-value-card"><strong>{side('a')}</strong><Field id="bridge-value-a" label={'מה חשוב לך ב־'+side('a')+'?'} value={draft.valueA} onChange={v=>update({valueA:v})} required placeholder="מה הערך שמתחת לבחירה?"/></div>
-          <div className="bridge-value-card"><strong>{side('b')}</strong><Field id="bridge-value-b" label={'מה חשוב לך ב־'+side('b')+'?'} value={draft.valueB} onChange={v=>update({valueB:v})} required placeholder="מה הערך שמתחת לבחירה?"/></div>
+          <div className="bridge-value-card"><strong>{side('a')}</strong><Field id="bridge-value-a" label={'מה חשוב לך ב־'+side('a')+'?'} value={draft.valueA} onChange={v=>update({valueA:v})} required placeholder="למשל: הקשר, כבוד, ביטחון"/></div>
+          <div className="bridge-value-card"><strong>{side('b')}</strong><Field id="bridge-value-b" label={'מה חשוב לך ב־'+side('b')+'?'} value={draft.valueB} onChange={v=>update({valueB:v})} required placeholder="למשל: נוכחות, אמון, קרבה"/></div>
         </div>
       </>;
       case 3:return <>
-        <h2>מתי זה כבר היה בחיים שלך?</h2>
-        <p>ניזכר ברגע אחד לפחות; אפשר עד שלושה. משהו שהיה באמת, אפילו רגע קטן.</p>
+        <h2>מתי זה כבר קרה?</h2>
         <fieldset className="bridge-fieldset"><legend>מאיזה צד נאסוף רגעים?</legend>
           <div className="bridge-options">
             <button type="button" aria-pressed={draft.inventorySide==='a'} onClick={()=>update({inventorySide:'a',momentAttempt:0})}>{side('a')}</button>
@@ -254,15 +373,13 @@ export function BridgePage() {
       </>;
       case 5:return <>
         <h2>שאלת הגשר</h2>
-        <p>אפשר לשאול בעדינות, בלי להכריח תשובה.</p>
         <blockquote className="bridge-question">{bridgeMomentQuestion(draft)}</blockquote>
         <p className="bridge-small">אין צורך לענות מיד. לפעמים רק השאלה פותחת כיוון.</p>
         <Field id="bridge-answer" label="מה עולה לך?" value={draft.bridgeAnswer} onChange={v=>update({bridgeAnswer:v})} rows={3} placeholder="אולי יש כאן מקום גם ל..."/>
         <button type="button" className="bridge-secondary" onClick={noAnswer}>{draft.momentAttempt<draft.moments.filter(m=>m.scene.trim()).length-1?'אין לי עדיין תשובה · רגע אחר':'אין לי עדיין תשובה · להמשיך בלי לכפות'}</button>
       </>;
       case 6:return <>
-        <h2>איך היית קורא לזה במילים שלך?</h2>
-        <p>השם הוא שלך. אין תשובה אחת נכונה.</p>
+        <h2>איך היית קורא לזה?</h2>
         <Field id="bridge-name" label="השם שלי" value={draft.chosenName} onChange={v=>update({chosenName:v})} required placeholder="למשל: כבוד שמאפשר לי להיות אבא נוכח"/>
         <button type="button" className="bridge-secondary" onClick={()=>setShowOffers(v=>!v)}>{showOffers?'הסתרת רעיונות':'קשה לי לנסח'}</button>
         {showOffers&&<div className="bridge-offers" role="group" aria-label="הצעות לא מחייבות">
@@ -348,19 +465,20 @@ export function BridgePage() {
     ?'לחזור לשם ולדייק':'המשך';
 
   return <div className="bridge-page" dir="rtl" ref={top}>
-    <header className="bridge-header">
-      <span className="bridge-eyebrow">WISDOM GAMES · חדר כושר לשיחה עם עצמנו</span>
-      <h1>הגשר <span>מ״או״ ל״וגם״</span></h1>
-      <div className="bridge-progress-meta"><span>שלב {draft.step+1} מתוך 10</span><span>{STEP_LABELS[draft.step]}</span></div>
-      <div className="bridge-progress" role="progressbar" aria-valuenow={draft.step+1} aria-valuemin={1} aria-valuemax={10} aria-label="התקדמות הגשר">
-        <div style={{width:(draft.step+1)*10+'%'}} />
+    <header className={draft.step===0?'bridge-header bridge-header--entry':'bridge-header'}>
+      <div className="bridge-header-line">
+        <div>
+          <span className="bridge-eyebrow">WISDOM GAMES</span>
+          <h1>הגשר <span>מ״או״ ל״וגם״</span></h1>
+        </div>
+        <button ref={helpTrigger} type="button" className="bridge-help-button" onClick={()=>setShowHelp(true)} aria-label="עזרה והגדרות">
+          <span aria-hidden="true">?</span><span>עזרה</span>
+        </button>
       </div>
-      <div className="bridge-steps" aria-hidden="true">
-        {STEP_LABELS.map((label,i)=><span key={i} title={label} className={i===draft.step?'current':i<draft.step?'done':''}>{i+1}</span>)}
-      </div>
+
     </header>
     {draft.step>0&&<IconTrail draft={draft}/>}
-    {review ? followUp : <section className="bridge-stage" aria-live="polite" aria-label={'שלב '+(draft.step+1)+': '+STEP_LABELS[draft.step]}>
+    {review ? followUp : <section className={draft.step===0?'bridge-stage bridge-stage--story':'bridge-stage'} aria-live="polite" aria-label={STEP_LABELS[draft.step]}>
       {renderStep()}
       {draft.mode==='practitioner'&&<PractitionerPanel step={draft.step}/>}
       {risk&&<div role="alert" className="bridge-warning">
@@ -369,15 +487,32 @@ export function BridgePage() {
         <p>אפשר למחוק הכול או להסיר את הביטוי כדי להמשיך בתרגול אחר.</p>
       </div>}
       {storageFailed&&!risk&&<p role="alert" className="bridge-warning">לא ניתן לשמור מידע בדפדפן הזה. בדוק הרשאות אחסון מקומי.</p>}
-      {draft.step<9&&<div className="bridge-actions">
+      {draft.step>0&&draft.step<9&&<div className="bridge-actions">
         {draft.step>0&&<button className="bridge-secondary" type="button" onClick={()=>move(-1)}>חזרה</button>}
         <button className="bridge-primary" type="button" disabled={!canNext} onClick={()=>move(1)}>{draft.step===0?'מתחילים':nextText}</button>
       </div>}
     </section>}
+    {showHelp&&<div className="bridge-help-backdrop" onClick={()=>setShowHelp(false)}>
+      <section className="bridge-help-dialog" role="dialog" aria-modal="true" aria-labelledby="bridge-help-title" onClick={e=>e.stopPropagation()}>
+        <div className="bridge-help-top"><h2 id="bridge-help-title">איך הגשר עובד?</h2>
+          <button ref={helpClose} type="button" onClick={()=>setShowHelp(false)} aria-label="סגירת העזרה">×</button>
+        </div>
+        <p>לפעמים מרגיש שצריך לבחור בין שני דברים שחשובים לנו. כאן נותנים מקום לשניהם ומנסים למצוא את ה״וגם״.</p>
+        <div className="bridge-help-route" aria-label="מה קורה בתרגול"><span>בוחרים רגע</span><span>מקשיבים לשני הצדדים</span><span>מנסים גשר</span></div>
+        <fieldset className="bridge-fieldset"><legend>איך לפנות אליך?</legend>
+          <div className="bridge-options">{([['f','את'],['m','אתה'],['pl','אתם']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={draft.address===v} onClick={()=>update({address:v})}>{label}</button>)}</div>
+        </fieldset>
+        <fieldset className="bridge-fieldset"><legend>אופן התרגול</legend>
+          <div className="bridge-options"><button type="button" aria-pressed={draft.mode==='self'} onClick={()=>update({mode:'self'})}>לעצמי</button><button type="button" aria-pressed={draft.mode==='practitioner'} onClick={()=>update({mode:'practitioner'})}>מצב מטפל</button></div>
+        </fieldset>
+        <p className="bridge-help-privacy">הטקסט וכרטיסי החזרה נשמרים בדפדפן הזה בלבד. אין שימוש במודל AI. זהו תרגול לקונפליקטים יומיומיים, לא סיוע במשבר.</p>
+        <button className="bridge-primary" type="button" onClick={()=>setShowHelp(false)}>חוזרים לסיפור</button>
+      </section>
+    </div>}
     <footer className="bridge-footer">
       <button type="button" className="bridge-link" onClick={()=>{if(confirmDelete)deleteEverything();else setConfirmDelete(true);}}>{confirmDelete?'לאישור: מחק הכול מהמכשיר':'מחק הכול'}</button>
       {confirmDelete&&<button type="button" className="bridge-link" onClick={()=>setConfirmDelete(false)}>ביטול המחיקה</button>}
-      <small>המידע נשאר במכשיר הזה בלבד. אין שימוש ב־AI ואין שליחת טקסט לשירות חיצוני.</small>
+
     </footer>
   </div>;
 }

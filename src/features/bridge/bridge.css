@@ -111,3 +111,54 @@
  .bridge-chips button{padding:10px 6px;font-size:.8rem}
  .bridge-intro-illustration{min-height:112px}
 }
+
+/* The bridge begins with a scene, never an instruction screen. */
+.bridge-header{padding:13px 18px;border-radius:15px}
+.bridge-header h1{margin:4px 0 0;font-size:clamp(1.18rem,2.5vw,1.5rem)}
+.bridge-header h1 span{font-size:.72em}
+.bridge-header:after{font-size:120px;top:-74px}
+.bridge-header-line{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
+.bridge-help-button{display:flex;gap:5px;align-items:center;border:1px solid #b9ded6;border-radius:999px;padding:6px 12px;background:#ffffff13;color:#fff;min-height:38px;white-space:nowrap}
+.bridge-help-button:hover{background:#ffffff2a}
+.bridge-stage--story{padding:0;border:none;box-shadow:none;background:transparent;gap:10px}
+.bridge-story-scene{display:grid;gap:16px;padding:clamp(18px,3vw,26px);background:#fff;border:1px solid #dae7e2;border-radius:18px;box-shadow:0 7px 26px #214b4110}
+.bridge-story-location{display:flex;align-items:center;gap:8px;color:#64817c;font-size:.82rem;font-weight:700}
+.bridge-story-location span:first-child{font-size:1.45rem}
+.bridge-story-scene h2{font-size:clamp(1.25rem,3.4vw,1.75rem);line-height:1.45;max-width:580px;margin:0;color:#193f42}
+.bridge-dialogue{display:grid;gap:9px}
+.bridge-speech{padding:13px 16px;background:#f2f7f5;border-radius:15px 15px 5px 15px;border:1px solid #dfeae6}
+.bridge-speech-second{background:#fff8ef;border:1px solid #efe2ca;border-radius:15px 15px 15px 5px;margin-inline-start:clamp(10px,6%,42px)}
+.bridge-speech-first{margin-inline-end:clamp(10px,6%,42px)}
+.bridge-speaker{color:#58756e;font-size:.8rem;font-weight:730}
+.bridge-speech p{margin:4px 0 0;font-size:1.04rem;line-height:1.5;color:#203e41;font-weight:620}
+.bridge-story-decision{display:grid;gap:11px;border-top:1px solid #e6eeea;padding-top:16px}
+.bridge-story-decision h3{font-size:1.2rem;margin:0;color:#173e3e}
+.bridge-story-options{display:grid;gap:9px}
+.bridge-story-options button{display:flex;align-items:center;justify-content:space-between;text-align:right;gap:12px;min-height:57px;padding:12px 15px;background:#f8fbfa;border:1px solid #c7ddd5;border-radius:13px;color:#204b48;font-weight:650}
+.bridge-story-options button:hover,.bridge-story-options button[aria-pressed=true]{border-color:#318474;background:#e6f4ee}
+.bridge-option-arrow{font-size:1.25rem;color:#2c8b75}
+.bridge-story-result{padding:15px;background:#eaf6f0;border:1px solid #b8d9ca;border-radius:13px;display:grid;gap:12px}
+.bridge-story-result p{margin:0;line-height:1.65;color:#285d53}
+.bridge-enter-story{border:0;border-radius:12px;min-height:52px;background:#24766b;color:#fff;font-size:1.02rem;font-weight:720;display:flex;align-items:center;justify-content:center;gap:15px;padding:12px 15px}
+.bridge-story-switch{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.bridge-story-switch button{border:0;background:transparent;color:#466d6a;font-size:.86rem;text-decoration:underline;text-underline-offset:3px;min-height:40px}
+.bridge-personal-prompt{font-size:.84rem!important;color:#6b817b!important}
+.bridge-help-backdrop{position:fixed;inset:0;background:#122f39bd;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px}
+.bridge-help-dialog{display:grid;gap:17px;max-width:490px;width:100%;max-height:min(90vh,760px);overflow:auto;padding:clamp(18px,4vw,28px);background:white;border-radius:20px;box-shadow:0 15px 60px #041f2550}
+.bridge-help-top{display:flex;align-items:center;justify-content:space-between}
+.bridge-help-top h2{margin:0;font-size:1.35rem}
+.bridge-help-top button{border:0;border-radius:999px;background:#f0f5f2;font-size:1.7rem;width:42px;height:42px}
+.bridge-help-dialog>p{margin:0;line-height:1.55;font-size:.91rem}
+.bridge-help-route{display:flex;gap:5px;flex-wrap:wrap;color:#336b60;font-size:.81rem}
+.bridge-help-route span{padding:8px;border-radius:9px;background:#edf7f1}
+.bridge-help-privacy{font-size:.78rem!important;color:#687c78}
+@media(max-width:540px){
+ .bridge-header{padding:12px 15px}
+ .bridge-header h1{margin:2px 0 0;font-size:1.23rem}
+ .bridge-story-scene{gap:13px;padding:15px}
+ .bridge-story-scene h2{font-size:1.26rem}
+ .bridge-speech p{font-size:1rem}
+ .bridge-story-options button{min-height:60px}
+ .bridge-help-backdrop{align-items:flex-end;padding:8px}
+ .bridge-help-dialog{border-radius:19px 19px 12px 12px;max-height:90vh}
+}
