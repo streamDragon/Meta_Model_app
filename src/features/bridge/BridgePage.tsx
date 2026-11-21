@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import {createPortal} from 'react-dom';
 import {
   ADDRESS_FORMS, BRIDGE_REVIEW_DAYS, bridgeMomentQuestion, bridgeRisk, buildNameOffers,
   buildNeedToKnowQuestion, buildTriggerPrompt, canMoveOn, makeCardText, newBridgeDraft,
@@ -13,7 +14,7 @@ import {
 import {BridgeCaseTrainer} from './BridgeCaseTrainer';
 import './bridge.css';
 
-export const BRIDGE_INTRO_SEEN_KEY='wisdom:bridge:intro-seen:v1';
+export const BRIDGE_INTRO_SEEN_KEY='wisdom:bridge:intro-seen:double-bind-v2';
 
 const STEP_LABELS=['מתחילים','ה״או״','שני הצדדים','רגעים אמיתיים','השהיה','שאלת הגשר','שם חדש','בדיקת גוף','בדיקת המציאות','הכרטיס'];
 const EXAMPLES=[
@@ -375,10 +376,10 @@ export function BridgePage() {
       <div className="bridge-header-line">
         <div>
           <span className="bridge-eyebrow">WISDOM GAMES</span>
-          <h1>הגשר <span>מ״או״ ל״וגם״</span></h1>
+          <h1>Double Bind <span>יציאה ממלכוד כפול</span></h1>
         </div>
         <button ref={helpTrigger} type="button" className="bridge-help-button" onClick={()=>setShowHelp(true)} aria-label="הקדמה והגדרות הגשר">
-          <span aria-hidden="true">?</span><span>מה זה?</span>
+          <span aria-hidden="true">?</span><span>הסבר</span>
         </button>
       </div>
 
@@ -398,30 +399,37 @@ export function BridgePage() {
         <button className="bridge-primary" type="button" disabled={!canNext} onClick={()=>move(1)}>{draft.step===0?'מתחילים':nextText}</button>
       </div>}
     </section>}
-    {showHelp&&<div className="bridge-help-backdrop" onClick={dismissHelp}>
+    {showHelp&&createPortal(<div className="bridge-help-backdrop" dir="rtl" onClick={dismissHelp}>
       <section className="bridge-help-dialog bridge-intro-dialog" role="dialog" aria-modal="true" aria-labelledby="bridge-help-title" aria-describedby="bridge-help-description" onClick={e=>e.stopPropagation()}>
         <div className="bridge-help-top">
           <span className="bridge-intro-kicker">WISDOM GAMES · מיקרו־אימון בשיחה</span>
           <button ref={helpClose} type="button" onClick={dismissHelp} aria-label="סגירת ההקדמה">×</button>
         </div>
         <div className="bridge-intro-content">
-          <h2 id="bridge-help-title">מהו ״הגשר״?</h2>
-          <p id="bridge-help-description">לפעמים שני דברים חשובים נראים כאילו צריך לבחור ביניהם. הגשר הוא שאלה שעוזרת לחפש מקום לשניהם, בלי למחוק אף צד.</p>
-          <div className="bridge-intro-example" aria-label="דוגמה מתוך המקרה של משה">
-            <div className="bridge-intro-or"><span>״או״</span><p>לכבד את אבא <b>או</b> להיות אבא קשוב ליוסי?</p></div>
-            <div className="bridge-intro-question"><span>שאלת הגשר</span><p>״כשאתה מקשיב ליוסי, איך גם הכבוד לאבא יכול להיות שם?״</p></div>
+          <h2 id="bridge-help-title">התמודדות עם Double Bind</h2>
+          <p id="bridge-help-description">מלכוד כפול אינו רק בחירה קשה. שתי דרישות סותרות יכולות לנעול אדם בתוך שדה שבו אפילו לדבר על הסתירה או לצאת מהמצב מרגיש אסור. בתרגיל נלמד לזהות את הנעילה, לתת מקום לאמת החלקית בכל צד ולפתוח מחדש את כללי המשחק.</p>
+          <div className="bridge-intro-example" aria-label="דוגמה להמחשת Double Bind">
+            <div className="bridge-intro-or"><span>שתי דרישות ומחסום</span><p>״אם אני לא מציית לאבא, אני בן לא מכבד; אם אני מציית, אני לא האב שאני רוצה להיות. אפילו לדבר על זה נחשב בעיניי חוסר כבוד.״</p></div>
+            <div className="bridge-intro-question"><span>יוצאים מן השדה</span><p>״מי קבע שכבוד מחייב הסכמה עם כל עצה?״ אחרי שנפתח מרחב לחשוב על הכלל: ״כשאתה מקשיב ליוסי, איך ערך הכבוד יכול להיות שם גם?״</p></div>
           </div>
           <div className="bridge-intro-mini">
-            <h3>מה פירוש ״או״ ו״וגם״?</h3>
-            <p>״או״ מתאר את המלכוד. ״וגם״ מזמין אפשרות חדשה. אלה לא מילות קסם, ולא חייבים למצוא חיבור בכל מחיר.</p>
+            <h3>למה לא מספיק לבחור בין א׳ לב׳?</h3>
+            <p>כשגם היכולת לדבר על הסתירה חסומה, בחירה בין הצדדים משאירה את הכללים ללא שינוי. קודם בוחנים את הנעילה, אחר כך את האמת החלקית בכל צד, ורק כשבטוח ומתאים מחפשים ״וגם״. לפעמים הפתרון הוא גבול או יציאה מן המצב.</p>
           </div>
           <div className="bridge-intro-mini">
-            <h3>מי המציא?</h3>
-            <p>״שאלת הגשר״ היא שם עבודה שנולד כאן מתוך העבודה של חגי עם המקרה של משה. היא נשענת על רעיונות ותיקים מ־NLP (בנדלר וגרינדר), ועל חשיבה דיאלקטית, המוכרת גם מ־DBT של מרשה ליינהאן. אין לה ממציא יחיד בשם הזה.</p>
+            <h3>מאיפה הרעיון?</h3>
+            <p>בייטסון, ג׳קסון, היילי וויקלנד הציגו את מושג ה־Double Bind ב־1956. הגישה הדיאלקטית של מרשה ליינהאן (DBT) מלמדת להכיל אמיתות חלקיות ומתח בין קבלה לשינוי; עבודת חלקים וגשטלט נותנות מקום לקולות שונים. זהו תרגיל לימודי המשלב רעיונות, לא שיטה עם ממציא יחיד או יעילות טיפולית מוכחת. מקרה משה הוא המחשה בלבד.</p>
           </div>
+          <details className="bridge-intro-sources">
+            <summary>המקורות התיאורטיים וההבחנות</summary>
+            <p>בייטסון ועמיתיו תיארו דרישות סותרות וקושי לדבר על הסתירה או לצאת מן הקשר. הדיאלקטיקה של DBT נותנת מקום לאמיתות חלקיות, ועבודה עם חלקים וגשטלט מעודדת הכרה בקולות שונים. אלה מסגרות שונות, לא הוכחה ליעילות תרגיל משולב זה.</p>
+            <a href="https://doi.org/10.1002/bs.3830010402" target="_blank" rel="noopener noreferrer">Bateson ואחרים, 1956 — המקור ל־Double Bind</a>
+            <a href="https://psychiatryonline.org/doi/10.1176/appi.psychotherapy.2015.69.2.97" target="_blank" rel="noopener noreferrer">Dialectical Behavior Therapy — התפתחות הגישה</a>
+            <p>התיאוריה המקורית לא הוכחה כהסבר לסכיזופרניה. בעימות שיש בו איום, כפייה או פגיעה אין לחייב שני צדדים להיפגש באמצע.</p>
+          </details>
           <div className="bridge-intro-mini">
             <h3>מה עושים בתרגול?</h3>
-            <p>מקשיבים לשיחת מטפל ומטופל, מזהים את שני הדברים החשובים, בוחרים שאלת גשר ורואים איך השיחה מתפתחת.</p>
+            <p>מקשיבים לשיחת מטפל ומטופל, מזהים את הדרישות הסותרות ואת מה שחוסם שיחה על הסתירה, מגלים את ההיגיון החלקי בכל צד, בוחרים שאלת מטא־תקשורת ואז בודקים אפשרות לחיבור או לגבול בטוח.</p>
           </div>
           <details className="bridge-intro-settings">
             <summary>הגדרות · לשון פנייה ומצב מטפל</summary>
@@ -444,7 +452,7 @@ export function BridgePage() {
         </div>
         <button className="bridge-primary bridge-intro-cta" type="button" onClick={dismissHelp}>הבנתי, נכנסים לשיחה ←</button>
       </section>
-    </div>}
+    </div>,document.body)}
 
   </div>;
 }

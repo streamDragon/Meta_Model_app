@@ -18,9 +18,11 @@ afterEach(()=>{cleanup();vi.restoreAllMocks();});
 function chooseCorrect(){
   const group=screen.getByRole('group',{name:'בחר את התגובה המתאימה'});
   const c=BRIDGE_CASES[0];
-  const current=screen.queryByText('מה אתה שומע כאן?')?c.orOptions:
-    screen.queryByText('מה חשוב לו באמת בכל צד?')?c.valueOptions:
+  const current=screen.queryByText('איפה המלכוד?')?c.orOptions:
+    screen.queryByText('מה מונע ממנו לצאת מהמלכוד?')?c.lockOptions:
+    screen.queryByText('איזו אמת חלקית יש בכל צד?')?c.valueOptions:
     screen.queryByText('איזה רגע כדאי לקחת לגשר?')?c.memoryOptions:
+    screen.queryByText('על איזה כלל אפשר לדבר מחדש?')?c.metaOptions:
     screen.queryByText(/איך תעזור ל/) ?c.bridgeOptions:
     screen.queryByText('מה תגיד עכשיו?')?c.bodyOptions:c.testOptions;
   fireEvent.click(within(group).getByRole('button',{name:new RegExp(current.find(o=>o.best)!.label.slice(0,10))}));
@@ -29,11 +31,13 @@ function playUntilSummary(){
   render(<BridgePage/>);
   expect(screen.getByRole('group',{name:'שיחה בין מטפל לבין משה'})).toBeTruthy();
   expect(screen.queryByRole('progressbar')).toBeNull();
-  chooseCorrect(); // OR
-  chooseCorrect(); // values
-  chooseCorrect(); // real moment
-  fireEvent.click(screen.getByRole('button',{name:/אל שאלת הגשר/}));
-  chooseCorrect(); // bridging question
+  chooseCorrect(); // contradicting messages
+  chooseCorrect(); // exit blocked
+  chooseCorrect(); // partial truths
+  chooseCorrect(); // resource moment
+  fireEvent.click(screen.getByRole('button',{name:/בוא נבדוק את כללי המלכוד/}));
+  chooseCorrect(); // metacommunication changes the rule
+  chooseCorrect(); // bridge is optional, after opening the frame
   fireEvent.click(screen.getByRole('button',{name:'כבוד בדרך שלי'}));
   chooseCorrect(); // gentle body check
   chooseCorrect(); // transfer
@@ -43,9 +47,9 @@ describe('Bridge guided case trainer',()=>{
  it('shows a first visit introduction that explains the bridge, example, origin and exercise',()=>{
    localStorage.removeItem(BRIDGE_INTRO_SEEN_KEY);
    render(<BridgePage/>);
-   const dialog=screen.getByRole('dialog',{name:'מהו ״הגשר״?'});
-   expect(within(dialog).getByText(/אין לה ממציא יחיד/)).toBeTruthy();
-   expect(within(dialog).getByText(/איך גם הכבוד לאבא/)).toBeTruthy();
+   const dialog=screen.getByRole('dialog',{name:'התמודדות עם Double Bind'});
+   expect(within(dialog).getByText(/בייטסון, ג׳קסון, היילי וויקלנד/)).toBeTruthy();
+   expect(within(dialog).getByText(/מי קבע שכבוד מחייב הסכמה/)).toBeTruthy();
    expect(within(dialog).getByText(/מקשיבים לשיחת מטפל ומטופל/)).toBeTruthy();
    fireEvent.click(within(dialog).getByRole('button',{name:/הבנתי, נכנסים לשיחה/}));
    expect(screen.queryByRole('dialog')).toBeNull();
@@ -56,7 +60,7 @@ describe('Bridge guided case trainer',()=>{
    render(<BridgePage/>);
    expect(screen.queryByRole('dialog')).toBeNull();
    fireEvent.click(screen.getByRole('button',{name:'הקדמה והגדרות הגשר'}));
-   expect(screen.getByRole('dialog',{name:'מהו ״הגשר״?'})).toBeTruthy();
+   expect(screen.getByRole('dialog',{name:'התמודדות עם Double Bind'})).toBeTruthy();
    fireEvent.click(screen.getByRole('button',{name:'סגירת ההקדמה'}));
    expect(screen.queryByRole('dialog')).toBeNull();
  });
@@ -67,16 +71,38 @@ describe('Bridge guided case trainer',()=>{
    expect(screen.getByText(/אם אני לא מקשיב לאבא/)).toBeTruthy();
    expect(screen.queryByRole('progressbar')).toBeNull();
    expect(screen.queryByLabelText('מצד אחד')).toBeNull();
-   expect(screen.getByText('מה אתה שומע כאן?')).toBeTruthy();
+   expect(screen.getByText('איפה המלכוד?')).toBeTruthy();
  });
  it('gives explanatory feedback for an incorrect interpretation, then lets the learner continue',()=>{
    render(<BridgePage/>);
    const group=screen.getByRole('group',{name:'בחר את התגובה המתאימה'});
    fireEvent.click(within(group).getByRole('button',{name:/אבא שלו צודק/}));
-   expect(screen.getByRole('status').textContent).toMatch(/מחפשים את שני הדברים/);
-   expect(screen.getByText('מה אתה שומע כאן?')).toBeTruthy();
+   expect(screen.getByRole('status').textContent).toMatch(/הכללים/);
+   expect(screen.getByText('איפה המלכוד?')).toBeTruthy();
    chooseCorrect();
-   expect(screen.getByText('מה חשוב לו באמת בכל צד?')).toBeTruthy();
+   expect(screen.getByText('מה מונע ממנו לצאת מהמלכוד?')).toBeTruthy();
+ });
+ it('recognizes blocked exit and asks a meta question before allowing the bridge',()=>{
+   render(<BridgePage/>);
+   chooseCorrect();
+   expect(screen.getByText('מה מונע ממנו לצאת מהמלכוד?')).toBeTruthy();
+   chooseCorrect();
+   expect(screen.getByText('איזו אמת חלקית יש בכל צד?')).toBeTruthy();
+   chooseCorrect();
+   chooseCorrect();
+   fireEvent.click(screen.getByRole('button',{name:/בוא נבדוק את כללי המלכוד/}));
+   expect(screen.getByText('על איזה כלל אפשר לדבר מחדש?')).toBeTruthy();
+   expect(screen.queryByText(/איך תעזור ל/)).toBeNull();
+   chooseCorrect();
+   expect(screen.getByText('מרחב חדש')).toBeTruthy();
+   expect(screen.getByText(/לכבד אדם גם בלי להסכים/)).toBeTruthy();
+ });
+ it('does not confuse a plain dilemma with a communication double bind in the intro',()=>{
+   localStorage.removeItem(BRIDGE_INTRO_SEEN_KEY);
+   render(<BridgePage/>);
+   const dialog=screen.getByRole('dialog',{name:'התמודדות עם Double Bind'});
+   expect(within(dialog).getByText(/אפילו לדבר על הסתירה או לצאת מהמצב/)).toBeTruthy();
+   expect(within(dialog).getByText(/לפעמים הפתרון הוא גבול/)).toBeTruthy();
  });
  it('completes Moshe and saves a case card for day 1,3,7',()=>{
    playUntilSummary();
@@ -107,7 +133,7 @@ describe('Bridge guided case trainer',()=>{
    render(<BridgePage/>);
    expect(screen.queryByRole('dialog')).toBeNull();
    fireEvent.click(screen.getByRole('button',{name:'הקדמה והגדרות הגשר'}));
-   const dialog=screen.getByRole('dialog',{name:'מהו ״הגשר״?'});
+   const dialog=screen.getByRole('dialog',{name:'התמודדות עם Double Bind'});
    fireEvent.click(within(dialog).getByText('הגדרות · לשון פנייה ומצב מטפל'));
    fireEvent.click(within(dialog).getByRole('button',{name:'את'}));
    expect(within(dialog).getByRole('button',{name:'את'}).getAttribute('aria-pressed')).toBe('true');

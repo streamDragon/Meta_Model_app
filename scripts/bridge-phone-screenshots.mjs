@@ -28,15 +28,15 @@ await call('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1})
 await call('Page.navigate',{url:pageURL});
 await pause(800);
 // First-visit onboarding: verify that the intro is visible on a clean session.
-await call('Runtime.evaluate',{expression:"localStorage.removeItem('wisdom:bridge:intro-seen:v1');localStorage.removeItem('wisdom:bridge:draft:v2');"});
+await call('Runtime.evaluate',{expression:"localStorage.removeItem('wisdom:bridge:intro-seen:double-bind-v2');localStorage.removeItem('wisdom:bridge:draft:v3');"});
 await call('Page.reload',{ignoreCache:true});
 await pause(900);
 const introCheck=await call('Runtime.evaluate',{expression:"document.querySelector('[role=dialog]')?.textContent",returnByValue:true});
-if(!introCheck.result?.value?.includes('מהו ״הגשר״?'))throw new Error('First-visit Bridge intro missing');
+if(!introCheck.result?.value?.includes('התמודדות עם Double Bind'))throw new Error('First-visit Bridge intro missing');
 const introImage=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
 fs.writeFileSync(path.join(dst,'bridge_intro_390x844.png'),Buffer.from(introImage.data,'base64'));
 console.log('CAPTURED bridge_intro_390x844.png');
-await call('Runtime.evaluate',{expression:"localStorage.setItem('wisdom:bridge:intro-seen:v1','1');"});
+await call('Runtime.evaluate',{expression:"localStorage.setItem('wisdom:bridge:intro-seen:double-bind-v2','1');"});
 
 const moshe={
  address:'m',mode:'self',sideA:'לכבד את אבא שלי',valueA:'כבוד והכרת תודה',
@@ -54,7 +54,7 @@ const moshe={
 const steps=[0,1,2,4,6,8];
 for(const step of steps){
   const value={...moshe,step,trainingMode:'case',caseId:'moshe'};
-  const code='localStorage.setItem("wisdom:bridge:draft:v2",'+JSON.stringify(JSON.stringify(value))+');';
+  const code='localStorage.setItem("wisdom:bridge:draft:v3",'+JSON.stringify(JSON.stringify(value))+');';
   const a=await call('Runtime.evaluate',{expression:code,returnByValue:true});
   if(a.exceptionDetails)throw Error('localStorage injection failed');
   await call('Page.reload',{ignoreCache:true});

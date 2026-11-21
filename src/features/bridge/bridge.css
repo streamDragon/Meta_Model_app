@@ -319,3 +319,23 @@
  .bridge-intro-mini p{font-size:.82rem}
  .bridge-intro-cta{margin:0 17px 15px;width:calc(100% - 34px)}
 }
+
+.bridge-case-escape{display:grid;gap:7px;padding:16px;border:1px solid #d1e5db;background:#f0f8f3;border-radius:14px;color:#235c50}
+.bridge-case-escape p{margin:0;line-height:1.65}
+.bridge-case-escape small{color:#54776c;line-height:1.55}
+
+.bridge-intro-sources{border-top:1px solid #e0ebe5;padding-top:8px;font-size:.79rem;color:#55736c}
+.bridge-intro-sources summary{cursor:pointer;font-weight:700;color:#276a5f}
+.bridge-intro-sources p{font-size:.79rem;line-height:1.6;margin:7px 0}
+.bridge-intro-sources a{display:block;margin:8px 0;color:#286d71;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+
+/* Portal to document.body so fixed navigation cannot cover the modal. */
+.bridge-help-backdrop{z-index:2147483000;direction:rtl}
+.bridge-intro-dialog{display:flex;flex-direction:column;max-height:calc(100dvh - 32px);overflow:hidden;font-family:inherit;text-align:right}
+.bridge-intro-dialog .bridge-help-top{flex:0 0 auto}
+.bridge-intro-content{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.bridge-intro-cta{flex:0 0 auto;cursor:pointer}
+@media(max-width:540px){
+ .bridge-help-backdrop{align-items:center;justify-content:center;padding:10px}
+ .bridge-intro-dialog{max-height:calc(100dvh - 20px);width:100%}
+}

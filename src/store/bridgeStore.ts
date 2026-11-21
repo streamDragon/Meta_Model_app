@@ -3,7 +3,8 @@ import {
   type BodyFit, type BridgeDraft, type SavedBridge,
 } from '../features/bridge/bridgeEngine';
 
-export const BRIDGE_DRAFT_KEY='wisdom:bridge:draft:v2';
+export const BRIDGE_DRAFT_KEY='wisdom:bridge:draft:v3';
+const PREVIOUS_BRIDGE_DRAFT_KEY='wisdom:bridge:draft:v2';
 const LEGACY_BRIDGE_DRAFT_KEY='wisdom:bridge:draft:v1';
 export const BRIDGE_CARDS_KEY='wisdom:bridge:cards:v1';
 export const BRIDGE_UPDATED_EVENT='wisdom:bridge:updated';
@@ -27,8 +28,14 @@ export function loadBridgeDraft():BridgeDraft {
     localStorage.removeItem(LEGACY_BRIDGE_DRAFT_KEY);
   } catch { /* blocked storage */ }
   const raw=fetchItem(BRIDGE_DRAFT_KEY);
-  if(!raw||typeof raw!=='object') return {...newBridgeDraft(), address:legacyAddress||'m'};
-  if(!raw||typeof raw!=='object')return newBridgeDraft();
+  // A resumed v2 case would point at the wrong screen after adding the exit-blocking and meta-communication phases.
+  // Preserve cards and the selected pronoun, but start the revised exercise with a new dialogue.
+  if(!raw||typeof raw!=='object') {
+    const previous=fetchItem(PREVIOUS_BRIDGE_DRAFT_KEY) as Partial<BridgeDraft>|null;
+    try{localStorage.removeItem(PREVIOUS_BRIDGE_DRAFT_KEY);}catch{/* blocked storage */}
+    const address=previous && ['m','f','pl'].includes(previous.address||'')?previous.address:legacyAddress;
+    return {...newBridgeDraft(),address:address||'m'};
+  }
   const d=raw as Partial<BridgeDraft>;
   const starter=newBridgeDraft();
   const draft:BridgeDraft={
@@ -37,7 +44,7 @@ export function loadBridgeDraft():BridgeDraft {
     mode:d.mode==='practitioner'?'practitioner':'self',
     trainingMode:d.trainingMode==='personal'?'personal':'case',
     caseId:['moshe','noa','daniel'].includes(d.caseId||'')?d.caseId!:null,
-    step:typeof d.step==='number'&&d.step>=0&&d.step<=9?d.step:0,
+    step:typeof d.step==='number'&&d.step>=0&&d.step<=(d.trainingMode==='personal'?9:10)?d.step:0,
     moments:Array.isArray(d.moments)?d.moments.slice(0,3).filter(m=>m&&typeof m.scene==='string').map(m=>({
       scene:m.scene.slice(0,450),saw:String(m.saw||'').slice(0,250),
       heard:String(m.heard||'').slice(0,250),felt:String(m.felt||'').slice(0,250),
@@ -55,7 +62,7 @@ export function saveBridgeDraft(d:BridgeDraft):boolean {
   return writeItem(BRIDGE_DRAFT_KEY,d);
 }
 export function clearBridgeDraft():void {
-  try {localStorage.removeItem(BRIDGE_DRAFT_KEY);localStorage.removeItem(LEGACY_BRIDGE_DRAFT_KEY);notify();} catch { /* blocked storage */ }
+  try {localStorage.removeItem(BRIDGE_DRAFT_KEY);localStorage.removeItem(LEGACY_BRIDGE_DRAFT_KEY);localStorage.removeItem(PREVIOUS_BRIDGE_DRAFT_KEY);notify();} catch { /* blocked storage */ }
 }
 function validCard(x:unknown):x is SavedBridge {
   if(!x||typeof x!=='object')return false;
@@ -100,5 +107,5 @@ export function markBridgeReview(id:string,day:number,fit:BodyFit,actionHappened
   return writeItem(BRIDGE_CARDS_KEY,cards.map(c=>c.id===id?copy:c));
 }
 export function deleteAllBridgeData():void {
-  try {localStorage.removeItem(BRIDGE_DRAFT_KEY);localStorage.removeItem(LEGACY_BRIDGE_DRAFT_KEY);localStorage.removeItem(BRIDGE_CARDS_KEY);notify();} catch {/* blocked storage */}
+  try {localStorage.removeItem(BRIDGE_DRAFT_KEY);localStorage.removeItem(LEGACY_BRIDGE_DRAFT_KEY);localStorage.removeItem(PREVIOUS_BRIDGE_DRAFT_KEY);localStorage.removeItem(BRIDGE_CARDS_KEY);notify();} catch {/* blocked storage */}
 }

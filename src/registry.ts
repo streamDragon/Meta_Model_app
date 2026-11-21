@@ -110,14 +110,14 @@ export const FEATURES: FeatureDef[] = [
     navLabel: 'אימון שיחה', icon: '💬', inBottomNav: true,
   },
   {
-    id: 'bridge', navGroup: 'core', title: 'הגשר: מ״או״ ל״וגם״',
-    shortDescription: 'שני דברים חשובים, רגעים אמיתיים, שאלת גשר וכרטיס לחזרה',
-    theoryFamily: 'values-criteria', skillTrained: 'לשמור מקום לשני ערכים ולבדוק דרך פעולה חדשה',
+    id: 'bridge', navGroup: 'core', title: 'התמודדות עם Double Bind · יציאה ממלכוד כפול',
+    shortDescription: 'מסרים סותרים, מחסום ליציאה מהשדה, אמת חלקית ומטא־תקשורת',
+    theoryFamily: 'values-criteria', skillTrained: 'לזהות Double Bind ולפתוח את המסגרת לפני חיבור אפשרי',
     difficulty: 1, desktopSupport: 'full', mobileSupport: 'full',
     dataSource: 'src/features/bridge/bridgeEngine.ts + src/store/bridgeStore.ts',
     route: '#bridge', component: BridgePage,
     status: 'beta', sourceValidation: 'placeholder',
-    navLabel: 'הגשר', icon: '🌉', inBottomNav: false,
+    navLabel: 'מלכוד כפול', icon: '🧩', inBottomNav: false,
   },
   {
     id: 'sleight-workshop', navGroup: 'core', title: 'זריזות לשון וסדנת פיצוצים',

@@ -56,12 +56,12 @@ export function HomePage() {
     </section>
     <section className="card learning-featured home-bridge">
       <div>
-        <span className="learning-eyebrow">הגשר · כשבע דקות</span>
-        <h3>שני דברים חשובים מתנגשים? בונים גשר.</h3>
-        <p>{bridgeDue > 0 ? bridgeDue + ' חזרות ממתינות לכרטיסי הגשר שלך.' : 'מ״או״ ל״וגם״: לשמוע את שני הצדדים, למצוא רגע ולבדוק אותו בחיים.'}</p>
+        <span className="learning-eyebrow">Double Bind · אימון שיחה</span>
+        <h3>כשגם הבחירה וגם הדרך לצאת ממנה חסומות</h3>
+        <p>{bridgeDue > 0 ? bridgeDue + ' חזרות ממתינות לכרטיסי הגשר שלך.' : 'לזהות מסרים סותרים, לתת מקום לאמת החלקית בכל צד ולפתוח את המסגרת.'}</p>
       </div>
       <div className="learning-actions">
-        <button type="button" className="btn btn-primary" onClick={() => go('bridge')}>{bridgeDue > 0 ? 'לחזרה על הגשר' : 'לבניית גשר'}</button>
+        <button type="button" className="btn btn-primary" onClick={() => go('bridge')}>{bridgeDue > 0 ? 'לחזרה על התרגול' : 'לתרגול מלכוד כפול'}</button>
       </div>
     </section>
     {pending && pendingScenario && <section className="card learning-transfer"><h3>מהתרגיל לחיים</h3><p>{pendingScenario.transferCue}</p><p className="learning-muted">בשיחה יומיומית שמתאימה לכך, ובהסכמת האדם. אפשר לבחור להקשיב בלבד.</p><div className="learning-actions"><button className="btn btn-primary" onClick={() => markTransfer(pending.id, 'tried')}>ניסיתי בשיחה</button><button className="btn btn-secondary" onClick={() => markTransfer(pending.id, 'not-yet')}>לא התאים הפעם</button></div><p className="learning-muted">זהו דיווח עצמי על ניסיון, ללא ציון וללא שמירת פרטי השיחה.</p></section>}
