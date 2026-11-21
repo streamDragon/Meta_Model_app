@@ -4,6 +4,7 @@ The main path is **practice plan → contextual dialogue → clarification → o
 
 | Feature | Job | Change and reason |
 |---|---|---|
+| Hidden Belief X-Ray | Hypothesize missing links *between* statements | Private local-only cues highlight up to three provisional relationships, original evidence quotes and one checking question. It does not infer private intent or provide clinical conclusions. Training mode lets learners compare their own question without AI grading; source-row labels and type names remain provisional pending approval. |
 | Home | Choose the next useful exercise | Practice recommendation and due reviews appear before the optional course gate; cards use one registry and plain task descriptions. |
 | Conversation gym | Choose a response in context | Six fictional dialogues, explanatory feedback, seven skills, spaced reviews and a real-life attempt prompt. A written draft is not graded or persisted. |
 | Categories | Find a useful clarification question | Search covers terms, descriptions, examples and questions. Three families/eleven patterns share the authoritative core pack with deployed legacy data. |
