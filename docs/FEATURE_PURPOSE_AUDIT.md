@@ -4,6 +4,7 @@ The main path is **practice plan → contextual dialogue → clarification → o
 
 | Feature | Job | Change and reason |
 |---|---|---|
+| The Bridge: OR to AND | Practice keeping two important values in view without forcing a choice | A Hebrew-first ten-screen guided sequence: both sides, positive values, up to three real moments, pause, rule-based bridge question, a name in the learner's words, body check with respectful return, trigger comparison, and a locally saved card with days 1/3/7 reviews. Optional practitioner theory, no AI dependency, no clinical claim. |
 | Hidden Belief X-Ray | Hypothesize missing links *between* statements | Private local-only cues highlight up to three provisional relationships, original evidence quotes and one checking question. It does not infer private intent or provide clinical conclusions. Training mode lets learners compare their own question without AI grading; source-row labels and type names remain provisional pending approval. |
 | Home | Choose the next useful exercise | Practice recommendation and due reviews appear before the optional course gate; cards use one registry and plain task descriptions. |
 | Conversation gym | Choose a response in context | Six fictional dialogues, explanatory feedback, seven skills, spaced reviews and a real-life attempt prompt. A written draft is not graded or persisted. |

@@ -5,6 +5,7 @@ import { RuptureWorkshopPage } from './features/sleight/RuptureWorkshopPage';
 import { CoachCrashGym } from './features/coachcrash/CoachCrashGym';
 import { BodyCueLab } from './features/coachcrash/BodyCueLab';
 import { HiddenBeliefXrayPage } from './features/hiddenbelief/HiddenBeliefXrayPage';
+import { BridgePage } from './features/bridge/BridgePage';
 import { FramingToolPage } from './features/framing/FramingToolPage';
 import { DailySetPage } from './features/daily/DailySetPage';
 import { HomePage } from './features/home/HomePage';
@@ -107,6 +108,16 @@ export const FEATURES: FeatureDef[] = [
     dataSource: 'src/data/conversationScenarios.ts', route: '#conversation',
     component: ConversationGymPage, status: 'beta', sourceValidation: 'placeholder',
     navLabel: 'אימון שיחה', icon: '💬', inBottomNav: true,
+  },
+  {
+    id: 'bridge', navGroup: 'core', title: 'הגשר: מ״או״ ל״וגם״',
+    shortDescription: 'שני דברים חשובים, רגעים אמיתיים, שאלת גשר וכרטיס לחזרה',
+    theoryFamily: 'values-criteria', skillTrained: 'לשמור מקום לשני ערכים ולבדוק דרך פעולה חדשה',
+    difficulty: 1, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'src/features/bridge/bridgeEngine.ts + src/store/bridgeStore.ts',
+    route: '#bridge', component: BridgePage,
+    status: 'beta', sourceValidation: 'placeholder',
+    navLabel: 'הגשר', icon: '🌉', inBottomNav: false,
   },
   {
     id: 'sleight-workshop', navGroup: 'core', title: 'זריזות לשון וסדנת פיצוצים',

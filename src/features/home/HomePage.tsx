@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { FEATURES, NAV_GROUPS } from '../../registry';
+import { BRIDGE_UPDATED_EVENT, dueBridgeReviews, loadBridgeCards } from '../../store/bridgeStore';
 import { CourseDoor } from './CourseDoor';
 import { dueReviews, isoDay, loadDailyState } from '../../lib/dailySet';
 import { CONVERSATION_SKILLS } from '../../data/conversationSkills';
@@ -9,6 +11,14 @@ import { useProgress } from '../../store/useProgress';
 
 export function HomePage() {
   const { learning, markTransfer, stored } = useConversationLearning();
+  const [bridgeCards, setBridgeCards] = useState(loadBridgeCards);
+  useEffect(() => {
+    const update = () => setBridgeCards(loadBridgeCards());
+    window.addEventListener(BRIDGE_UPDATED_EVENT, update);
+    window.addEventListener('storage', update);
+    return () => { window.removeEventListener(BRIDGE_UPDATED_EVENT, update); window.removeEventListener('storage', update); };
+  }, []);
+  const bridgeDue = dueBridgeReviews(bridgeCards).length;
   const { progress } = useProgress();
   const recommended = recommendScenario(learning);
   const pending = [...learning.sessions].reverse().find((s) => s.transfer === 'planned');
@@ -42,6 +52,16 @@ export function HomePage() {
       <div className="learning-actions">
         <button className="btn btn-primary" onClick={() => go('daily-set')}>{dailyDone ? 'עוד סט' : 'להתחיל'}</button>
         {!isNew && <button className="btn btn-secondary" onClick={() => go('conversation')}>אימון שיחה: {recommended.title}</button>}
+      </div>
+    </section>
+    <section className="card learning-featured home-bridge">
+      <div>
+        <span className="learning-eyebrow">הגשר · כשבע דקות</span>
+        <h3>שני דברים חשובים מתנגשים? בונים גשר.</h3>
+        <p>{bridgeDue > 0 ? bridgeDue + ' חזרות ממתינות לכרטיסי הגשר שלך.' : 'מ״או״ ל״וגם״: לשמוע את שני הצדדים, למצוא רגע ולבדוק אותו בחיים.'}</p>
+      </div>
+      <div className="learning-actions">
+        <button type="button" className="btn btn-primary" onClick={() => go('bridge')}>{bridgeDue > 0 ? 'לחזרה על הגשר' : 'לבניית גשר'}</button>
       </div>
     </section>
     {pending && pendingScenario && <section className="card learning-transfer"><h3>מהתרגיל לחיים</h3><p>{pendingScenario.transferCue}</p><p className="learning-muted">בשיחה יומיומית שמתאימה לכך, ובהסכמת האדם. אפשר לבחור להקשיב בלבד.</p><div className="learning-actions"><button className="btn btn-primary" onClick={() => markTransfer(pending.id, 'tried')}>ניסיתי בשיחה</button><button className="btn btn-secondary" onClick={() => markTransfer(pending.id, 'not-yet')}>לא התאים הפעם</button></div><p className="learning-muted">זהו דיווח עצמי על ניסיון, ללא ציון וללא שמירת פרטי השיחה.</p></section>}
