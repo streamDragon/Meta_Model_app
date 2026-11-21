@@ -27,6 +27,22 @@ describe('Hidden Belief X-Ray', () => {
       for(const evidence of item.evidence) expect(moshe).toContain(evidence.quote);
     }
   });
+  it('finds cautious cross-statement cues in Hebrew without translating user text', () => {
+    const hebrew=[
+      'אבא שלי מתקשר כל ערב ומבקר אותי.',
+      'אחרי השיחה אני צועק על הילדים.',
+      'אני חושב שאני אבא טוב.',
+      'הקול של אבא הוא הקול האמיתי. מה שאני חושב לא נחשב.',
+      'הלוואי שפעם אחת הוא יראה אותי.',
+    ].join('\\n');
+    const output=analyseHiddenBeliefs({text:hebrew});
+    expect(output).toHaveLength(3);
+    expect(output.map(x=>x.type)).toEqual(['hidden_equation','fused','presupposition']);
+    for (const item of output) {
+      expect(item.status).toBe('hypothesis');
+      expect(item.evidence.every(ev=>hebrew.includes(ev.quote))).toBe(true);
+    }
+  });
   it('stops when risk terms require safety support', () => {
     expect(safetyRequiresReferral('I plan to kill myself')).toBe(true);
     expect(analyseHiddenBeliefs({text:'I plan to kill myself\nNobody understands.'})).toHaveLength(0);
