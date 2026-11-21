@@ -29,6 +29,7 @@ function intro(){
 function goToBody(){
   intro();
   // A chosen story fills the context and draft values. The learner can edit them.
+  fireEvent.click(screen.getByRole('button',{name:'זה לא בדיוק מה שחשוב לי'}));
   type('מה חשוב לך ב־לכבד את אבא שלי','כבוד והכרת תודה');
   type('מה חשוב לך ב־להיות האבא','סבלנות ורוגע');
   next();
@@ -110,8 +111,9 @@ describe('The Bridge - guided mobile flow',()=>{
    expect(screen.getByRole('heading',{name:/הבטחת שתגיע הביתה/})).toBeTruthy();
    fireEvent.click(within(screen.getByRole('group',{name:'מה אתה עושה עכשיו?'})).getAllByRole('button')[1]);
    fireEvent.click(screen.getByRole('button',{name:/ממשיך מכאן/}));
-   expect(screen.getByRole('heading',{name:'מה חשוב לך כאן?'})).toBeTruthy();
-   expect((document.getElementById('bridge-value-a') as HTMLInputElement).value.length).toBeGreaterThan(0);
+   expect(screen.getByRole('heading',{name:'שני הדברים חשובים לך.'})).toBeTruthy();
+   expect(screen.getAllByText('להיות מישהו שאפשר לסמוך עליו בעבודה').length).toBeGreaterThan(0);
+   expect(screen.queryByLabelText(/מה חשוב לך ב־לעמוד במחויבויות/)).toBeNull();
    expect(screen.queryByRole('progressbar')).toBeNull();
  });
   it('surfaces day-1 card review without another app',()=>{

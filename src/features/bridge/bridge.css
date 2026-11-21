@@ -162,3 +162,12 @@
  .bridge-help-backdrop{align-items:flex-end;padding:8px}
  .bridge-help-dialog{border-radius:19px 19px 12px 12px;max-height:90vh}
 }
+
+.bridge-two-values{display:grid;gap:7px}
+.bridge-value-statement{display:grid;gap:9px;padding:17px 19px;border-radius:15px;background:#ecf6f2;border:1px solid #cde4db}
+.bridge-value-statement:last-child{background:#fdf7ec;border-color:#eddfc6}
+.bridge-value-statement span{font-size:.84rem;color:#506f65}
+.bridge-value-statement strong{font-size:1.15rem;line-height:1.55;color:#174c43}
+.bridge-and-symbol{text-align:center;color:#27816c;font-weight:850;font-size:1.13rem}
+.bridge-edit-values{justify-self:center;min-height:37px}
+.bridge-value-edit{display:grid;gap:13px;padding:15px;border:1px solid #dfebe6;border-radius:12px;background:#fafcfb}

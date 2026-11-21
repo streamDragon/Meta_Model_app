@@ -150,6 +150,7 @@ export function BridgePage() {
   const [storyIndex,setStoryIndex]=useState(0);
   const [storyChoice,setStoryChoice]=useState<number|null>(null);
   const [showHelp,setShowHelp]=useState(false);
+  const [showValueEditor,setShowValueEditor]=useState(false);
   const helpTrigger=useRef<HTMLButtonElement|null>(null);
   const helpClose=useRef<HTMLButtonElement|null>(null);
   const top=useRef<HTMLDivElement|null>(null);
@@ -192,6 +193,7 @@ export function BridgePage() {
 
   const startStory=(choice:typeof ENTRY_STORIES[number])=>{
     setStoryChoice(null);
+    setShowValueEditor(false);
     setDraft(current=>({
       ...newBridgeDraft(),address:current.address,mode:current.mode,
       step:2,sideA:choice.sideA,sideB:choice.sideB,
@@ -202,6 +204,7 @@ export function BridgePage() {
   };
   const writeOwnStory=()=>{
     setStoryChoice(null);
+    setShowValueEditor(true);
     update({step:1,sideA:'',sideB:'',valueA:'',valueB:'',trigger:''});
   };
   const update=(patch:Partial<BridgeDraft>)=>{setDraft(old=>({...old,...patch}));setSavedId(null);setCopyNote('');};
@@ -333,12 +336,25 @@ export function BridgePage() {
         </div>
       </>;
       case 2:return <>
-        <h2>מה חשוב לך כאן?</h2>
-        <p className="bridge-personal-prompt">אלה רק הצעות. שנה אותן למילים שלך אם צריך.</p>
-        <div className="bridge-dual">
-          <div className="bridge-value-card"><strong>{side('a')}</strong><Field id="bridge-value-a" label={'מה חשוב לך ב־'+side('a')+'?'} value={draft.valueA} onChange={v=>update({valueA:v})} required placeholder="למשל: הקשר, כבוד, ביטחון"/></div>
-          <div className="bridge-value-card"><strong>{side('b')}</strong><Field id="bridge-value-b" label={'מה חשוב לך ב־'+side('b')+'?'} value={draft.valueB} onChange={v=>update({valueB:v})} required placeholder="למשל: נוכחות, אמון, קרבה"/></div>
+        <h2>שני הדברים חשובים לך.</h2>
+        <div className="bridge-two-values">
+          <div className="bridge-value-statement">
+            <span>{side('a')}</span>
+            <strong>{value('a')}</strong>
+          </div>
+          <div className="bridge-and-symbol" aria-hidden="true">וגם</div>
+          <div className="bridge-value-statement">
+            <span>{side('b')}</span>
+            <strong>{value('b')}</strong>
+          </div>
         </div>
+        <button type="button" className="bridge-link bridge-edit-values" aria-expanded={showValueEditor} onClick={()=>setShowValueEditor(v=>!v)}>
+          {showValueEditor?'סגור עריכה':'זה לא בדיוק מה שחשוב לי'}
+        </button>
+        {showValueEditor&&<div className="bridge-value-edit">
+          <Field id="bridge-value-a" label={'מה חשוב לך ב־'+side('a')+'?'} value={draft.valueA} onChange={v=>update({valueA:v})} required placeholder="במילים שלך"/>
+          <Field id="bridge-value-b" label={'מה חשוב לך ב־'+side('b')+'?'} value={draft.valueB} onChange={v=>update({valueB:v})} required placeholder="במילים שלך"/>
+        </div>}
       </>;
       case 3:return <>
         <h2>מתי זה כבר קרה?</h2>
