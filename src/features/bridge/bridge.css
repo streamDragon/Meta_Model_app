@@ -290,3 +290,32 @@
  .bridge-case-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
  .bridge-case-picker button{min-width:0;width:100%;padding:8px 5px;font-size:.73rem;line-height:1.35;white-space:normal}
 }
+
+/* A once-only explanatory overlay, independent of the scenario flow. */
+.bridge-intro-dialog{max-width:550px;gap:0;padding:0;overflow:hidden;background:#fff}
+.bridge-intro-dialog .bridge-help-top{padding:17px 22px 9px;gap:14px}
+.bridge-intro-kicker{font-size:.76rem;letter-spacing:.01em;color:#3f8074;font-weight:800}
+.bridge-intro-content{display:grid;gap:14px;overflow:auto;min-height:0;padding:0 22px 17px}
+.bridge-intro-content h2{margin:0;color:#164a49;font-size:clamp(1.4rem,4vw,1.8rem);letter-spacing:-.03em}
+.bridge-intro-content>p{line-height:1.6;font-size:.96rem;color:#405d5a;margin:0}
+.bridge-intro-example{display:grid;gap:7px;background:#f2f8f5;border:1px solid #d8eae0;padding:13px;border-radius:13px}
+.bridge-intro-example>div{display:grid;gap:4px}
+.bridge-intro-example span{font-size:.73rem;font-weight:800;color:#498175}
+.bridge-intro-example p{margin:0;line-height:1.65;color:#244f4c;font-weight:650}
+.bridge-intro-question{border-top:1px solid #d8e8df;padding-top:8px}
+.bridge-intro-mini{display:grid;gap:3px}
+.bridge-intro-mini h3{margin:0;color:#244b49;font-size:.93rem}
+.bridge-intro-mini p{margin:0;font-size:.83rem;line-height:1.63;color:#536d6a}
+.bridge-intro-settings{border:1px solid #e1ebe7;background:#fafcfb;border-radius:10px;padding:11px 13px}
+.bridge-intro-settings>summary{cursor:pointer;color:#396d65;font-size:.83rem}
+.bridge-intro-settings-body{display:grid;gap:14px;padding-top:14px}
+.bridge-intro-cta{margin:0 22px 20px;flex:none;width:calc(100% - 44px);background:#226e60}
+@media(max-width:540px){
+ .bridge-intro-dialog{max-height:min(92dvh,820px);border-radius:18px}
+ .bridge-intro-dialog .bridge-help-top{padding:13px 17px 6px}
+ .bridge-intro-content{padding:0 17px 13px;gap:11px}
+ .bridge-intro-example{padding:10px 12px}
+ .bridge-intro-content>p{font-size:.92rem}
+ .bridge-intro-mini p{font-size:.82rem}
+ .bridge-intro-cta{margin:0 17px 15px;width:calc(100% - 34px)}
+}

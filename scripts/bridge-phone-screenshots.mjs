@@ -27,6 +27,17 @@ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScal
 await call('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
 await call('Page.navigate',{url:pageURL});
 await pause(800);
+// First-visit onboarding: verify that the intro is visible on a clean session.
+await call('Runtime.evaluate',{expression:"localStorage.removeItem('wisdom:bridge:intro-seen:v1');localStorage.removeItem('wisdom:bridge:draft:v2');"});
+await call('Page.reload',{ignoreCache:true});
+await pause(900);
+const introCheck=await call('Runtime.evaluate',{expression:"document.querySelector('[role=dialog]')?.textContent",returnByValue:true});
+if(!introCheck.result?.value?.includes('מהו ״הגשר״?'))throw new Error('First-visit Bridge intro missing');
+const introImage=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+fs.writeFileSync(path.join(dst,'bridge_intro_390x844.png'),Buffer.from(introImage.data,'base64'));
+console.log('CAPTURED bridge_intro_390x844.png');
+await call('Runtime.evaluate',{expression:"localStorage.setItem('wisdom:bridge:intro-seen:v1','1');"});
+
 const moshe={
  address:'m',mode:'self',sideA:'לכבד את אבא שלי',valueA:'כבוד והכרת תודה',
  sideB:'להיות האבא שאני רוצה להיות לילדים',valueB:'סבלנות ורוגע',

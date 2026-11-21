@@ -1,13 +1,14 @@
 // @vitest-environment jsdom
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
 import {cleanup,fireEvent,render,screen,within} from '@testing-library/react';
-import {BridgePage} from './BridgePage';
+import {BridgePage,BRIDGE_INTRO_SEEN_KEY} from './BridgePage';
 import {BRIDGE_CASES} from './bridgeCases';
 import {BRIDGE_DRAFT_KEY,BRIDGE_CARDS_KEY,loadBridgeCards,makeBridgeCard,saveBridgeCard} from '../../store/bridgeStore';
 import {newBridgeDraft} from './bridgeEngine';
 
 beforeEach(()=>{
   localStorage.clear();
+  localStorage.setItem(BRIDGE_INTRO_SEEN_KEY,'1');
   Element.prototype.scrollIntoView=vi.fn();
   vi.spyOn(window,'setInterval').mockImplementation(()=>0 as unknown as number);
   vi.spyOn(window,'clearInterval').mockImplementation(()=>{});
@@ -39,6 +40,27 @@ function playUntilSummary(){
 }
 
 describe('Bridge guided case trainer',()=>{
+ it('shows a first visit introduction that explains the bridge, example, origin and exercise',()=>{
+   localStorage.removeItem(BRIDGE_INTRO_SEEN_KEY);
+   render(<BridgePage/>);
+   const dialog=screen.getByRole('dialog',{name:'מהו ״הגשר״?'});
+   expect(within(dialog).getByText(/אין לה ממציא יחיד/)).toBeTruthy();
+   expect(within(dialog).getByText(/איך גם הכבוד לאבא/)).toBeTruthy();
+   expect(within(dialog).getByText(/מקשיבים לשיחת מטפל ומטופל/)).toBeTruthy();
+   fireEvent.click(within(dialog).getByRole('button',{name:/הבנתי, נכנסים לשיחה/}));
+   expect(screen.queryByRole('dialog')).toBeNull();
+   expect(localStorage.getItem(BRIDGE_INTRO_SEEN_KEY)).toBe('1');
+   expect(screen.getByRole('group',{name:'שיחה בין מטפל לבין משה'})).toBeTruthy();
+ });
+ it('does not force the introduction again but can reopen it through What is this?',()=>{
+   render(<BridgePage/>);
+   expect(screen.queryByRole('dialog')).toBeNull();
+   fireEvent.click(screen.getByRole('button',{name:'הקדמה והגדרות הגשר'}));
+   expect(screen.getByRole('dialog',{name:'מהו ״הגשר״?'})).toBeTruthy();
+   fireEvent.click(screen.getByRole('button',{name:'סגירת ההקדמה'}));
+   expect(screen.queryByRole('dialog')).toBeNull();
+ });
+
  it('begins with a realistic client/therapist conversation and no forms',()=>{
    render(<BridgePage/>);
    expect(screen.getByText(/כל ערב אבא מתקשר/)).toBeTruthy();
@@ -84,11 +106,12 @@ describe('Bridge guided case trainer',()=>{
  it('has gender and theory settings only in a help overlay',()=>{
    render(<BridgePage/>);
    expect(screen.queryByRole('dialog')).toBeNull();
-   fireEvent.click(screen.getByRole('button',{name:'עזרה והגדרות'}));
-   const dialog=screen.getByRole('dialog',{name:'איך הגשר עובד?'});
+   fireEvent.click(screen.getByRole('button',{name:'הקדמה והגדרות הגשר'}));
+   const dialog=screen.getByRole('dialog',{name:'מהו ״הגשר״?'});
+   fireEvent.click(within(dialog).getByText('הגדרות · לשון פנייה ומצב מטפל'));
    fireEvent.click(within(dialog).getByRole('button',{name:'את'}));
    expect(within(dialog).getByRole('button',{name:'את'}).getAttribute('aria-pressed')).toBe('true');
-   fireEvent.click(within(dialog).getByRole('button',{name:'סגירת העזרה'}));
+   fireEvent.click(within(dialog).getByRole('button',{name:'סגירת ההקדמה'}));
    expect(screen.queryByRole('dialog')).toBeNull();
  });
  it('surfaces due day-one card review in same trainer',()=>{

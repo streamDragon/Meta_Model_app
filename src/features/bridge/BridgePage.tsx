@@ -13,6 +13,8 @@ import {
 import {BridgeCaseTrainer} from './BridgeCaseTrainer';
 import './bridge.css';
 
+export const BRIDGE_INTRO_SEEN_KEY='wisdom:bridge:intro-seen:v1';
+
 const STEP_LABELS=['מתחילים','ה״או״','שני הצדדים','רגעים אמיתיים','השהיה','שאלת הגשר','שם חדש','בדיקת גוף','בדיקת המציאות','הכרטיס'];
 const EXAMPLES=[
   ['לכבד את אבא שלי','להיות האבא שאני רוצה להיות לילדים','כשאבא מתקשר בערב ומעיר על החינוך'],
@@ -76,7 +78,10 @@ export function BridgePage() {
   const [reviewAction,setReviewAction]=useState<'yes'|'no'|'not-yet'>('not-yet');
   const [copyNote,setCopyNote]=useState('');
   const [confirmDelete,setConfirmDelete]=useState(false);
-  const [showHelp,setShowHelp]=useState(false);
+  const [showHelp,setShowHelp]=useState(()=>{
+    try{return localStorage.getItem(BRIDGE_INTRO_SEEN_KEY)!=='1';}
+    catch{return true;}
+  });
   const [showValueEditor,setShowValueEditor]=useState(false);
   const helpTrigger=useRef<HTMLButtonElement|null>(null);
   const helpClose=useRef<HTMLButtonElement|null>(null);
@@ -86,12 +91,16 @@ export function BridgePage() {
   const forms=ADDRESS_FORMS[draft.address];
   const due=dueBridgeReviews(cards);
   const chosenCard=cards.find(c=>c.id===savedId);
+  const dismissHelp=()=>{
+    try{localStorage.setItem(BRIDGE_INTRO_SEEN_KEY,'1');}catch{/* storage blocked */}
+    setShowHelp(false);
+  };
   useEffect(()=>{
     if(!showHelp)return;
     const before=document.body.style.overflow;
     document.body.style.overflow='hidden';
     helpClose.current?.focus();
-    const onKey=(event:KeyboardEvent)=>{ if(event.key==='Escape') setShowHelp(false); };
+    const onKey=(event:KeyboardEvent)=>{ if(event.key==='Escape') dismissHelp(); };
     document.addEventListener('keydown',onKey);
     return ()=>{ document.body.style.overflow=before; document.removeEventListener('keydown',onKey); helpTrigger.current?.focus(); };
   },[showHelp]);
@@ -368,8 +377,8 @@ export function BridgePage() {
           <span className="bridge-eyebrow">WISDOM GAMES</span>
           <h1>הגשר <span>מ״או״ ל״וגם״</span></h1>
         </div>
-        <button ref={helpTrigger} type="button" className="bridge-help-button" onClick={()=>setShowHelp(true)} aria-label="עזרה והגדרות">
-          <span aria-hidden="true">?</span><span>עזרה</span>
+        <button ref={helpTrigger} type="button" className="bridge-help-button" onClick={()=>setShowHelp(true)} aria-label="הקדמה והגדרות הגשר">
+          <span aria-hidden="true">?</span><span>מה זה?</span>
         </button>
       </div>
 
@@ -389,27 +398,51 @@ export function BridgePage() {
         <button className="bridge-primary" type="button" disabled={!canNext} onClick={()=>move(1)}>{draft.step===0?'מתחילים':nextText}</button>
       </div>}
     </section>}
-    {showHelp&&<div className="bridge-help-backdrop" onClick={()=>setShowHelp(false)}>
-      <section className="bridge-help-dialog" role="dialog" aria-modal="true" aria-labelledby="bridge-help-title" onClick={e=>e.stopPropagation()}>
-        <div className="bridge-help-top"><h2 id="bridge-help-title">איך הגשר עובד?</h2>
-          <button ref={helpClose} type="button" onClick={()=>setShowHelp(false)} aria-label="סגירת העזרה">×</button>
+    {showHelp&&<div className="bridge-help-backdrop" onClick={dismissHelp}>
+      <section className="bridge-help-dialog bridge-intro-dialog" role="dialog" aria-modal="true" aria-labelledby="bridge-help-title" aria-describedby="bridge-help-description" onClick={e=>e.stopPropagation()}>
+        <div className="bridge-help-top">
+          <span className="bridge-intro-kicker">WISDOM GAMES · מיקרו־אימון בשיחה</span>
+          <button ref={helpClose} type="button" onClick={dismissHelp} aria-label="סגירת ההקדמה">×</button>
         </div>
-        <p>לפעמים מרגיש שצריך לבחור בין שני דברים שחשובים לנו. כאן נותנים מקום לשניהם ומנסים למצוא את ה״וגם״.</p>
-        <div className="bridge-help-route" aria-label="מה קורה בתרגול"><span>בוחרים רגע</span><span>מקשיבים לשני הצדדים</span><span>מנסים גשר</span></div>
-        <fieldset className="bridge-fieldset"><legend>איך לפנות אליך?</legend>
-          <div className="bridge-options">{([['f','את'],['m','אתה'],['pl','אתם']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={draft.address===v} onClick={()=>update({address:v})}>{label}</button>)}</div>
-        </fieldset>
-        <fieldset className="bridge-fieldset"><legend>אופן התרגול</legend>
-          <div className="bridge-options"><button type="button" aria-pressed={draft.mode==='self'} onClick={()=>update({mode:'self'})}>לעצמי</button><button type="button" aria-pressed={draft.mode==='practitioner'} onClick={()=>update({mode:'practitioner'})}>מצב מטפל</button></div>
-        </fieldset>
-        <p className="bridge-help-privacy">הטקסט וכרטיסי החזרה נשמרים בדפדפן הזה בלבד. אין שימוש במודל AI. זהו תרגול לקונפליקטים יומיומיים, לא סיוע במשבר.</p>
-        <button className="bridge-primary" type="button" onClick={()=>setShowHelp(false)}>חוזרים לשיחה</button>
-        <div className="bridge-help-delete">
-          <button type="button" className="bridge-link" onClick={()=>{if(confirmDelete){deleteEverything();setShowHelp(false);}else setConfirmDelete(true);}}>
-            {confirmDelete?'אישור מחיקת כל הנתונים מהמכשיר':'מחיקת כל נתוני הגשר מהמכשיר'}
-          </button>
-          {confirmDelete&&<button type="button" className="bridge-link" onClick={()=>setConfirmDelete(false)}>ביטול</button>}
+        <div className="bridge-intro-content">
+          <h2 id="bridge-help-title">מהו ״הגשר״?</h2>
+          <p id="bridge-help-description">לפעמים שני דברים חשובים נראים כאילו צריך לבחור ביניהם. הגשר הוא שאלה שעוזרת לחפש מקום לשניהם, בלי למחוק אף צד.</p>
+          <div className="bridge-intro-example" aria-label="דוגמה מתוך המקרה של משה">
+            <div className="bridge-intro-or"><span>״או״</span><p>לכבד את אבא <b>או</b> להיות אבא קשוב ליוסי?</p></div>
+            <div className="bridge-intro-question"><span>שאלת הגשר</span><p>״כשאתה מקשיב ליוסי, איך גם הכבוד לאבא יכול להיות שם?״</p></div>
+          </div>
+          <div className="bridge-intro-mini">
+            <h3>מה פירוש ״או״ ו״וגם״?</h3>
+            <p>״או״ מתאר את המלכוד. ״וגם״ מזמין אפשרות חדשה. אלה לא מילות קסם, ולא חייבים למצוא חיבור בכל מחיר.</p>
+          </div>
+          <div className="bridge-intro-mini">
+            <h3>מי המציא?</h3>
+            <p>״שאלת הגשר״ היא שם עבודה שנולד כאן מתוך העבודה של חגי עם המקרה של משה. היא נשענת על רעיונות ותיקים מ־NLP (בנדלר וגרינדר), ועל חשיבה דיאלקטית, המוכרת גם מ־DBT של מרשה ליינהאן. אין לה ממציא יחיד בשם הזה.</p>
+          </div>
+          <div className="bridge-intro-mini">
+            <h3>מה עושים בתרגול?</h3>
+            <p>מקשיבים לשיחת מטפל ומטופל, מזהים את שני הדברים החשובים, בוחרים שאלת גשר ורואים איך השיחה מתפתחת.</p>
+          </div>
+          <details className="bridge-intro-settings">
+            <summary>הגדרות · לשון פנייה ומצב מטפל</summary>
+            <div className="bridge-intro-settings-body">
+              <fieldset className="bridge-fieldset"><legend>איך לפנות אליך?</legend>
+                <div className="bridge-options">{([['f','את'],['m','אתה'],['pl','אתם']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={draft.address===v} onClick={()=>update({address:v})}>{label}</button>)}</div>
+              </fieldset>
+              <fieldset className="bridge-fieldset"><legend>אופן התרגול</legend>
+                <div className="bridge-options"><button type="button" aria-pressed={draft.mode==='self'} onClick={()=>update({mode:'self'})}>לעצמי</button><button type="button" aria-pressed={draft.mode==='practitioner'} onClick={()=>update({mode:'practitioner'})}>מצב מטפל</button></div>
+              </fieldset>
+              <p className="bridge-help-privacy">הטקסט וכרטיסי החזרה נשמרים בדפדפן הזה בלבד; ללא שליחה למודל AI. זהו תרגול, לא טיפול במשבר.</p>
+              <div className="bridge-help-delete">
+                <button type="button" className="bridge-link" onClick={()=>{if(confirmDelete){deleteEverything();dismissHelp();}else setConfirmDelete(true);}}>
+                  {confirmDelete?'אישור מחיקת כל הנתונים מהמכשיר':'מחיקת כל נתוני הגשר מהמכשיר'}
+                </button>
+                {confirmDelete&&<button type="button" className="bridge-link" onClick={()=>setConfirmDelete(false)}>ביטול</button>}
+              </div>
+            </div>
+          </details>
         </div>
+        <button className="bridge-primary bridge-intro-cta" type="button" onClick={dismissHelp}>הבנתי, נכנסים לשיחה ←</button>
       </section>
     </div>}
 
