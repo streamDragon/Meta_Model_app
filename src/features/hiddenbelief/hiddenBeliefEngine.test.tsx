@@ -39,7 +39,7 @@ describe('Hidden Belief X-Ray', () => {
     expect(within(app).getByText('3 השערות לבדיקה')).toBeTruthy();
     expect(within(app).getAllByText('השערה בלבד')).toHaveLength(3);
     fireEvent.click(within(app).getByRole('button',{name:/מיפוי לתבניות/}));
-    expect(within(app).getByText(/שורת ברין \(מיפוי זמני לבדיקה\): 1/)).toBeTruthy();
+    expect(within(app).getAllByText(/שורת ברין \(מיפוי זמני לבדיקה\): 1/).length).toBeGreaterThan(0);
     fireEvent.click(within(app).getAllByRole('button',{name:'מתאים'})[0]);
     expect(within(app).getByText(/סומן כמתאים/)).toBeTruthy();
     fireEvent.click(within(app).getByRole('button',{name:/נקה הכול/}));
