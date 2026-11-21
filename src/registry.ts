@@ -4,6 +4,7 @@ import { SleightOfMouthPage } from './features/sleight/SleightOfMouthPage';
 import { RuptureWorkshopPage } from './features/sleight/RuptureWorkshopPage';
 import { CoachCrashGym } from './features/coachcrash/CoachCrashGym';
 import { BodyCueLab } from './features/coachcrash/BodyCueLab';
+import { HiddenBeliefXrayPage } from './features/hiddenbelief/HiddenBeliefXrayPage';
 import { FramingToolPage } from './features/framing/FramingToolPage';
 import { DailySetPage } from './features/daily/DailySetPage';
 import { HomePage } from './features/home/HomePage';
@@ -148,6 +149,16 @@ export const FEATURES: FeatureDef[] = [
     route: '#body-cue-lab', component: BodyCueLab,
     status: 'beta', sourceValidation: 'placeholder',
     navLabel: 'התבוננות בגוף', icon: '🧍', inBottomNav: false,
+  },
+  {
+    id: 'hidden-belief-xray', navGroup: 'labs', title: 'רנטגן אמונות נסתרות',
+    shortDescription: 'השערות על קשרי משמעות בין משפטים, עם ראיות ושאלות לבדיקה',
+    theoryFamily: 'meta-model', skillTrained: 'זיהוי פערים בין משפטים והצעת שאלת בירור ללא אבחון',
+    difficulty: 3, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'src/features/hiddenbelief/hiddenBeliefEngine.ts',
+    route: '#hidden-belief-xray', component: HiddenBeliefXrayPage,
+    status: 'beta', sourceValidation: 'placeholder',
+    navLabel: 'אמונות נסתרות', icon: '🔬', inBottomNav: false,
   },
   {
     id: 'framing', navGroup: 'core', title: 'פריימינג טול',
