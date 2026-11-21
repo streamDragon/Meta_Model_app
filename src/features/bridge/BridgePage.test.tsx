@@ -2,7 +2,8 @@
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
 import {cleanup,fireEvent,render,screen,within} from '@testing-library/react';
 import {BridgePage} from './BridgePage';
-import {makeBridgeCard,saveBridgeCard,loadBridgeCards} from '../../store/bridgeStore';
+import {BRIDGE_CASES} from './bridgeCases';
+import {BRIDGE_DRAFT_KEY,BRIDGE_CARDS_KEY,loadBridgeCards,makeBridgeCard,saveBridgeCard} from '../../store/bridgeStore';
 import {newBridgeDraft} from './bridgeEngine';
 
 beforeEach(()=>{
@@ -12,120 +13,95 @@ beforeEach(()=>{
   vi.spyOn(window,'clearInterval').mockImplementation(()=>{});
 });
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
-function next(){
-  fireEvent.click(screen.getByRole('button',{name:/^(מתחילים|המשך|להמשיך|לחזור לשם ולדייק)$/}));
+
+function chooseCorrect(){
+  const group=screen.getByRole('group',{name:'בחר את התגובה המתאימה'});
+  const c=BRIDGE_CASES[0];
+  const current=screen.queryByText('מה אתה שומע כאן?')?c.orOptions:
+    screen.queryByText('מה חשוב לו באמת בכל צד?')?c.valueOptions:
+    screen.queryByText('איזה רגע כדאי לקחת לגשר?')?c.memoryOptions:
+    screen.queryByText(/איך תעזור ל/) ?c.bridgeOptions:
+    screen.queryByText('מה תגיד עכשיו?')?c.bodyOptions:c.testOptions;
+  fireEvent.click(within(group).getByRole('button',{name:new RegExp(current.find(o=>o.best)!.label.slice(0,10))}));
 }
-function type(label:string,value:string){
-  fireEvent.change(screen.getByLabelText(label,{exact:false}),{target:{value}});
-}
-function intro(){
+function playUntilSummary(){
   render(<BridgePage/>);
-  expect(screen.getByRole('heading',{name:/כוס נשברת במטבח/})).toBeTruthy();
+  expect(screen.getByRole('group',{name:'שיחה בין מטפל לבין משה'})).toBeTruthy();
   expect(screen.queryByRole('progressbar')).toBeNull();
-  fireEvent.click(within(screen.getByRole('group',{name:'מה אתה עושה עכשיו?'})).getAllByRole('button')[0]);
-  expect(screen.getByText(/יוסי עדיין עומד ליד השברים/)).toBeTruthy();
-  fireEvent.click(screen.getByRole('button',{name:/ממשיך מכאן/}));
+  chooseCorrect(); // OR
+  chooseCorrect(); // values
+  chooseCorrect(); // real moment
+  fireEvent.click(screen.getByRole('button',{name:/אל שאלת הגשר/}));
+  chooseCorrect(); // bridging question
+  fireEvent.click(screen.getByRole('button',{name:'כבוד בדרך שלי'}));
+  chooseCorrect(); // gentle body check
+  chooseCorrect(); // transfer
 }
-function goToBody(){
-  intro();
-  // A chosen story fills the context and draft values. The learner can edit them.
-  fireEvent.click(screen.getByRole('button',{name:'זה לא בדיוק מה שחשוב לי'}));
-  type('מה חשוב לך ב־לכבד את אבא שלי','כבוד והכרת תודה');
-  type('מה חשוב לך ב־להיות האבא','סבלנות ורוגע');
-  next();
-  type('מה קרה?','כשיוסי שבר כוס וכרעתי לידו ושאלתי אם הוא בסדר');
-  next();
-  next();
-  expect(screen.getByRole('heading',{name:'שאלת הגשר'})).toBeTruthy();
-  expect(screen.getByText(/איך אפשר לתת שם מקום גם לכבוד והכרת תודה/)).toBeTruthy();
-  type('מה עולה לך?','אפשר לתת כבוד לאבא וליוסי');
-  next();
-  type('השם שלי','כבוד עם נוכחות');
-  next();
-  expect(screen.getByText('איך השם הזה מרגיש?')).toBeTruthy();
-}
-describe('The Bridge - guided mobile flow',()=>{
- it('builds a full Moshe card, then schedules review on days 1,3,7',()=>{
-   goToBody();
-   fireEvent.click(within(screen.getByRole('group',{name:'מידת התאמה'})).getByRole('button',{name:'מתאים'}));
-   next();
-   expect(screen.getByText('בוא נבדוק מול הרגע האמיתי')).toBeTruthy();
-   fireEvent.change(document.getElementById('bridge-before')!,{target:{value:'8'}});
-   fireEvent.change(document.getElementById('bridge-after')!,{target:{value:'3'}});
-   type('איך אתה יודע','אני מצליח לראות גם את אבא וגם את יוסי');
-   next();
-   expect(screen.getByText('הגשר שלי')).toBeTruthy();
-   expect(screen.getByText(/לפני: 8\/10/)).toBeTruthy();
-   expect(screen.getByText(/עכשיו: 3\/10/)).toBeTruthy();
-   type('צעד קטן','לעצור לפני התגובה');
-   fireEvent.click(screen.getByRole('button',{name:'שמירת הכרטיס במכשיר'}));
-   expect(screen.getByText(/הכרטיס נשמר במכשיר/)).toBeTruthy();
-   const cards=loadBridgeCards();
-   expect(cards).toHaveLength(1);
-   expect(cards[0].reviewsDone).toEqual([]);
-   expect(cards[0].draft.chosenName).toBe('כבוד עם נוכחות');
- });
- it('body check rejection respects one side and returns to naming',()=>{
-   goToBody();
-   fireEvent.click(within(screen.getByRole('group',{name:'מידת התאמה'})).getByRole('button',{name:'לא'}));
-   expect(screen.getByText(/מה הצד של לכבד את אבא שלי צריך לדעת/)).toBeTruthy();
-   type('מה הצד של לכבד את אבא שלי','שאפשר לשמור כבוד בלי לוותר על הילדים');
-   fireEvent.click(screen.getByRole('button',{name:'לחזור לשם ולדייק'}));
-   expect(screen.getByText(/איך היית קורא לזה/)).toBeTruthy();
-   expect(screen.getByText(/אפשר לעדכן את השם/)).toBeTruthy();
- });
- it('offers three non-authoritative names without forcing a selected name',()=>{
-   goToBody();
-   fireEvent.click(screen.getByRole('button',{name:'חזרה'}));
-   type('השם שלי','');
-   fireEvent.click(screen.getByRole('button',{name:'קשה לי לנסח'}));
-   const offers=within(screen.getByRole('group',{name:'הצעות לא מחייבות'})).getAllByRole('button');
-   expect(offers).toHaveLength(4);
-   expect(offers.slice(0,3).every(x=>x.textContent?.startsWith('יש שקוראים לזה'))).toBe(true);
-   fireEvent.click(offers[0]);
-   expect((document.getElementById('bridge-name') as HTMLInputElement).value).toContain('וגם');
- });
- it('stops on risk words and prevents following steps',()=>{
+
+describe('Bridge guided case trainer',()=>{
+ it('begins with a realistic client/therapist conversation and no forms',()=>{
    render(<BridgePage/>);
-   fireEvent.click(screen.getByRole('button',{name:'סיפור משלי'}));
-   type('מצד אחד','אני מתכוון להתאבד');
-   type('ומצד שני','לנוח');
-   expect(screen.getByText('עוצרים כאן.')).toBeTruthy();
-   expect((screen.getByRole('button',{name:'המשך'}) as HTMLButtonElement).disabled).toBe(true);
- });
- it('keeps gender settings and help in an overlay, never an onboarding form',()=>{
-   render(<BridgePage/>);
+   expect(screen.getByText(/כל ערב אבא מתקשר/)).toBeTruthy();
+   expect(screen.getByText(/אם אני לא מקשיב לאבא/)).toBeTruthy();
    expect(screen.queryByRole('progressbar')).toBeNull();
-   expect(screen.queryByRole('group',{name:'איך לפנות אליך?'})).toBeNull();
+   expect(screen.queryByLabelText('מצד אחד')).toBeNull();
+   expect(screen.getByText('מה אתה שומע כאן?')).toBeTruthy();
+ });
+ it('gives explanatory feedback for an incorrect interpretation, then lets the learner continue',()=>{
+   render(<BridgePage/>);
+   const group=screen.getByRole('group',{name:'בחר את התגובה המתאימה'});
+   fireEvent.click(within(group).getByRole('button',{name:/אבא שלו צודק/}));
+   expect(screen.getByRole('status').textContent).toMatch(/מחפשים את שני הדברים/);
+   expect(screen.getByText('מה אתה שומע כאן?')).toBeTruthy();
+   chooseCorrect();
+   expect(screen.getByText('מה חשוב לו באמת בכל צד?')).toBeTruthy();
+ });
+ it('completes Moshe and saves a case card for day 1,3,7',()=>{
+   playUntilSummary();
+   expect(screen.getByText(/הוא הצליח לעצור ולפנות ליוסי/)).toBeTruthy();
+   expect(screen.getByText('לפני: 8/10')).toBeTruthy();
+   expect(screen.getByText('אחרי: 6/10')).toBeTruthy();
+   fireEvent.click(screen.getByRole('button',{name:'שמור את הכרטיס לתרגול חוזר'}));
+   expect(screen.getByText(/חזרות: יום 1, יום 3 ויום 7/)).toBeTruthy();
+   expect(loadBridgeCards()).toHaveLength(1);
+   expect(loadBridgeCards()[0].draft.caseId).toBe('moshe');
+ });
+ it('offers three distinct full dialogue cases and private own-story mode',()=>{
+   render(<BridgePage/>);
+   fireEvent.click(screen.getByRole('button',{name:/נועה · עבודה ומשפחה/}));
+   expect(screen.getByText(/הבטחתי לבת שלי/)).toBeTruthy();
+   fireEvent.click(screen.getByRole('button',{name:/דניאל · אמת וקשר/}));
+   expect(screen.getByText(/חבר שלי אלון/)).toBeTruthy();
+   fireEvent.click(screen.getByRole('button',{name:/מקרה משלי/}));
+   expect(screen.getByRole('heading',{name:'מה שני הדברים שמושכים אותך?'})).toBeTruthy();
+ });
+ it('does not resume the obsolete onboarding form saved by older versions',()=>{
+   localStorage.setItem('wisdom:bridge:draft:v1',JSON.stringify({...newBridgeDraft(),trainingMode:'personal',step:1,sideA:'משהו ישן'}));
+   render(<BridgePage/>);
+   expect(screen.getByText(/כל ערב אבא מתקשר/)).toBeTruthy();
+   expect(localStorage.getItem('wisdom:bridge:draft:v1')).toBeNull();
+ });
+ it('has gender and theory settings only in a help overlay',()=>{
+   render(<BridgePage/>);
+   expect(screen.queryByRole('dialog')).toBeNull();
    fireEvent.click(screen.getByRole('button',{name:'עזרה והגדרות'}));
    const dialog=screen.getByRole('dialog',{name:'איך הגשר עובד?'});
    fireEvent.click(within(dialog).getByRole('button',{name:'את'}));
    expect(within(dialog).getByRole('button',{name:'את'}).getAttribute('aria-pressed')).toBe('true');
    fireEvent.click(within(dialog).getByRole('button',{name:'סגירת העזרה'}));
    expect(screen.queryByRole('dialog')).toBeNull();
-   expect(screen.getByRole('heading',{name:/כוס נשברת במטבח/})).toBeTruthy();
  });
- it('lets a beginner choose another story without typing or a progress meter',()=>{
-   render(<BridgePage/>);
-   fireEvent.click(screen.getByRole('button',{name:/סיפור אחר/}));
-   expect(screen.getByRole('heading',{name:/הבטחת שתגיע הביתה/})).toBeTruthy();
-   fireEvent.click(within(screen.getByRole('group',{name:'מה אתה עושה עכשיו?'})).getAllByRole('button')[1]);
-   fireEvent.click(screen.getByRole('button',{name:/ממשיך מכאן/}));
-   expect(screen.getByRole('heading',{name:'שני הדברים חשובים לך.'})).toBeTruthy();
-   expect(screen.getAllByText('להיות מישהו שאפשר לסמוך עליו בעבודה').length).toBeGreaterThan(0);
-   expect(screen.queryByLabelText(/מה חשוב לך ב־לעמוד במחויבויות/)).toBeNull();
-   expect(screen.queryByRole('progressbar')).toBeNull();
- });
-  it('surfaces day-1 card review without another app',()=>{
-   const d={...newBridgeDraft(),step:9,chosenName:'שם חדש',sideA:'משפחה',sideB:'עבודה'};
-   const card=makeBridgeCard(d,new Date(Date.now()-2*86400000));
+ it('surfaces due day-one card review in same trainer',()=>{
+   const draft={...newBridgeDraft(),step:8,chosenName:'הגשר שלי',sideA:'בית',sideB:'עבודה'};
+   const card=makeBridgeCard(draft,new Date(Date.now()-2*86400000));
    saveBridgeCard(card);
    render(<BridgePage/>);
-   fireEvent.click(screen.getByRole('button',{name:/יום 1 · שם חדש/}));
-   expect(screen.getByRole('heading',{name:'שם חדש'})).toBeTruthy();
+   fireEvent.click(screen.getByRole('button',{name:/יום 1 · הגשר שלי/}));
    expect(screen.getByRole('group',{name:'האם השם עדיין מתאים'})).toBeTruthy();
-   fireEvent.click(within(screen.getByRole('group',{name:'האם השם עדיין מתאים'})).getByRole('button',{name:'מתאים'}));
-   fireEvent.click(screen.getByRole('button',{name:'שמירת החזרה'}));
-   expect(loadBridgeCards()[0].reviewsDone).toContain(1);
+ });
+ it('does not require patient personal details and has no external LLM dependency',()=>{
+   render(<BridgePage/>);
+   expect(localStorage.getItem(BRIDGE_CARDS_KEY)).toBeNull();
+   expect(JSON.parse(localStorage.getItem(BRIDGE_DRAFT_KEY)!).trainingMode).toBe('case');
  });
 });

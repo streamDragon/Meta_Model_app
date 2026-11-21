@@ -3,7 +3,8 @@ import {
   type BodyFit, type BridgeDraft, type SavedBridge,
 } from '../features/bridge/bridgeEngine';
 
-export const BRIDGE_DRAFT_KEY='wisdom:bridge:draft:v1';
+export const BRIDGE_DRAFT_KEY='wisdom:bridge:draft:v2';
+const LEGACY_BRIDGE_DRAFT_KEY='wisdom:bridge:draft:v1';
 export const BRIDGE_CARDS_KEY='wisdom:bridge:cards:v1';
 export const BRIDGE_UPDATED_EVENT='wisdom:bridge:updated';
 
@@ -17,7 +18,16 @@ function writeItem(key:string,data:unknown):boolean {
   try {localStorage.setItem(key,JSON.stringify(data));notify();return true;} catch {return false;}
 }
 export function loadBridgeDraft():BridgeDraft {
+  // v1 stored a half-completed abstract onboarding form. Do not strand returning
+  // learners there. Preserve saved cards and explicit address preference only.
+  let legacyAddress:BridgeDraft['address']|undefined;
+  try {
+    const legacy=fetchItem(LEGACY_BRIDGE_DRAFT_KEY) as Partial<BridgeDraft>|null;
+    if(legacy && ['m','f','pl'].includes(legacy.address||'')) legacyAddress=legacy.address;
+    localStorage.removeItem(LEGACY_BRIDGE_DRAFT_KEY);
+  } catch { /* blocked storage */ }
   const raw=fetchItem(BRIDGE_DRAFT_KEY);
+  if(!raw||typeof raw!=='object') return {...newBridgeDraft(), address:legacyAddress||'m'};
   if(!raw||typeof raw!=='object')return newBridgeDraft();
   const d=raw as Partial<BridgeDraft>;
   const starter=newBridgeDraft();
@@ -25,6 +35,8 @@ export function loadBridgeDraft():BridgeDraft {
     ...starter,...d,
     address:['f','m','pl'].includes(d.address||'')?d.address!:starter.address,
     mode:d.mode==='practitioner'?'practitioner':'self',
+    trainingMode:d.trainingMode==='personal'?'personal':'case',
+    caseId:['moshe','noa','daniel'].includes(d.caseId||'')?d.caseId!:null,
     step:typeof d.step==='number'&&d.step>=0&&d.step<=9?d.step:0,
     moments:Array.isArray(d.moments)?d.moments.slice(0,3).filter(m=>m&&typeof m.scene==='string').map(m=>({
       scene:m.scene.slice(0,450),saw:String(m.saw||'').slice(0,250),
@@ -43,7 +55,7 @@ export function saveBridgeDraft(d:BridgeDraft):boolean {
   return writeItem(BRIDGE_DRAFT_KEY,d);
 }
 export function clearBridgeDraft():void {
-  try {localStorage.removeItem(BRIDGE_DRAFT_KEY);notify();} catch { /* blocked storage */ }
+  try {localStorage.removeItem(BRIDGE_DRAFT_KEY);localStorage.removeItem(LEGACY_BRIDGE_DRAFT_KEY);notify();} catch { /* blocked storage */ }
 }
 function validCard(x:unknown):x is SavedBridge {
   if(!x||typeof x!=='object')return false;
@@ -88,5 +100,5 @@ export function markBridgeReview(id:string,day:number,fit:BodyFit,actionHappened
   return writeItem(BRIDGE_CARDS_KEY,cards.map(c=>c.id===id?copy:c));
 }
 export function deleteAllBridgeData():void {
-  try {localStorage.removeItem(BRIDGE_DRAFT_KEY);localStorage.removeItem(BRIDGE_CARDS_KEY);notify();} catch {/* blocked storage */}
+  try {localStorage.removeItem(BRIDGE_DRAFT_KEY);localStorage.removeItem(LEGACY_BRIDGE_DRAFT_KEY);localStorage.removeItem(BRIDGE_CARDS_KEY);notify();} catch {/* blocked storage */}
 }

@@ -10,6 +10,7 @@ import {
   loadBridgeCards, loadBridgeDraft, makeBridgeCard, markBridgeReview,
   saveBridgeCard, saveBridgeDraft, type DueBridgeReview,
 } from '../../store/bridgeStore';
+import {BridgeCaseTrainer} from './BridgeCaseTrainer';
 import './bridge.css';
 
 const STEP_LABELS=['מתחילים','ה״או״','שני הצדדים','רגעים אמיתיים','השהיה','שאלת הגשר','שם חדש','בדיקת גוף','בדיקת המציאות','הכרטיס'];
@@ -17,78 +18,6 @@ const EXAMPLES=[
   ['לכבד את אבא שלי','להיות האבא שאני רוצה להיות לילדים','כשאבא מתקשר בערב ומעיר על החינוך'],
   ['להשקיע בעבודה','להיות פנוי למשפחה','כשמגיעה בקשה חדשה מהעבודה'],
   ['לומר את האמת','לשמור על השלום','כשמישהו שואל אותי שאלה לא נוחה'],
-] as const;
-
-const ENTRY_STORIES = [
-  {
-    id: 'family', scene: 'ערב בבית', icon: '🏠',
-    opening: 'כוס נשברת במטבח. יוסי עומד ליד השברים. בדיוק אבא שלך מתקשר.',
-    speakerA: 'אבא בטלפון', lineA: 'אמרתי לך, אתה רך מדי עם הילדים.',
-    speakerB: 'יוסי, ליד הכוס', lineB: 'אבא, אני מפחד. תבוא?',
-    sideA: 'לכבד את אבא שלי',
-    sideB: 'להיות האבא שאני רוצה להיות לילדים',
-    valueA: 'לשמור על הקשר והכבוד עם אבא',
-    valueB: 'לתת ליוסי להרגיש שאני כאן בשבילו',
-    trigger: 'כשאבא מעיר לי בזמן שיוסי צריך אותי',
-  },
-  {
-    id: 'work', scene: 'שש בערב', icon: '🕕',
-    opening: 'כבר הבטחת שתגיע הביתה מוקדם. הטלפון רוטט.',
-    speakerA: 'המנהל', lineA: 'יש משהו דחוף. תוכל להישאר?',
-    speakerB: 'בבית', lineB: 'מחכים לך. הבטחת.',
-    sideA: 'לעמוד במחויבויות שלי בעבודה',
-    sideB: 'להיות פנוי למשפחה',
-    valueA: 'להיות מישהו שאפשר לסמוך עליו בעבודה',
-    valueB: 'לקיים את מה שהבטחתי למשפחה',
-    trigger: 'כשהעבודה מבקשת ממני להישאר בזמן שמחכים לי בבית',
-  },
-  {
-    id: 'honesty', scene: 'שיחה עם חברה', icon: '💬',
-    opening: 'היא מספרת לך על החלטה שעשתה. יש לך ספקות.',
-    speakerA: 'החברה', lineA: 'תגיד לי בכנות. מה דעתך?',
-    speakerB: 'בתוכך', lineB: 'אני לא רוצה לפגוע בה.',
-    sideA: 'להגיד את האמת',
-    sideB: 'לשמור על הקשר והרגישות',
-    valueA: 'להיות כן עם האנשים שחשובים לי',
-    valueB: 'להגן על החברות שלנו',
-    trigger: 'כשחברה מבקשת ממני לומר משהו שעלול לפגוע בה',
-  },
-] as const;
-
-
-// There is no right/wrong button here. Each choice reveals a real human cost
-// before introducing the idea that both values deserve attention.
-const STORY_CHOICES = [
-  [
-    {
-      label: 'אני ממשיך להקשיב לאבא.',
-      result: 'אבא ממשיך לדבר. יוסי עדיין עומד ליד השברים ומחכה לך.',
-    },
-    {
-      label: 'אני ניגש ליוסי ומסיים את השיחה.',
-      result: 'יוסי נרגע קצת. אתה חושב על אבא ועל מה שקרה ביניכם.',
-    },
-  ],
-  [
-    {
-      label: 'אני נשאר בעבודה.',
-      result: 'המנהל נושם לרווחה. בבית מחכים, ואתה יודע שהבטחת להגיע.',
-    },
-    {
-      label: 'אני אומר למנהל שאני יוצא.',
-      result: 'בבית שמחים. בעבודה נשאר עניין חשוב שלא מצאת לו פתרון.',
-    },
-  ],
-  [
-    {
-      label: 'אני אומר את מה שאני באמת חושב.',
-      result: 'אמרת את האמת. עכשיו אתה רואה שהחברה שלך נפגעה.',
-    },
-    {
-      label: 'אני מעדן את התשובה כדי לא לפגוע.',
-      result: 'השיחה נשארת נעימה. בפנים אתה מרגיש שלא אמרת הכול.',
-    },
-  ],
 ] as const;
 
 const SENSATIONS: Array<{id:BodySensation;name:string}>=[
@@ -147,8 +76,6 @@ export function BridgePage() {
   const [reviewAction,setReviewAction]=useState<'yes'|'no'|'not-yet'>('not-yet');
   const [copyNote,setCopyNote]=useState('');
   const [confirmDelete,setConfirmDelete]=useState(false);
-  const [storyIndex,setStoryIndex]=useState(0);
-  const [storyChoice,setStoryChoice]=useState<number|null>(null);
   const [showHelp,setShowHelp]=useState(false);
   const [showValueEditor,setShowValueEditor]=useState(false);
   const helpTrigger=useRef<HTMLButtonElement|null>(null);
@@ -159,7 +86,6 @@ export function BridgePage() {
   const forms=ADDRESS_FORMS[draft.address];
   const due=dueBridgeReviews(cards);
   const chosenCard=cards.find(c=>c.id===savedId);
-  const story=ENTRY_STORIES[storyIndex];
   useEffect(()=>{
     if(!showHelp)return;
     const before=document.body.style.overflow;
@@ -191,21 +117,13 @@ export function BridgePage() {
     try{top.current?.scrollIntoView({behavior:'smooth',block:'start'});}catch{ /* tests/older browsers */ }
   },[draft.step,review]);
 
-  const startStory=(choice:typeof ENTRY_STORIES[number])=>{
-    setStoryChoice(null);
+  const writeOwnStory=()=>{
     setShowValueEditor(false);
+    setSavedId(null);
     setDraft(current=>({
       ...newBridgeDraft(),address:current.address,mode:current.mode,
-      step:2,sideA:choice.sideA,sideB:choice.sideB,
-      valueA:choice.valueA,valueB:choice.valueB,trigger:choice.trigger,
+      trainingMode:'personal',step:1,
     }));
-    setSavedId(null);
-    setShowOffers(false);
-  };
-  const writeOwnStory=()=>{
-    setStoryChoice(null);
-    setShowValueEditor(true);
-    update({step:1,sideA:'',sideB:'',valueA:'',valueB:'',trigger:''});
   };
   const update=(patch:Partial<BridgeDraft>)=>{setDraft(old=>({...old,...patch}));setSavedId(null);setCopyNote('');};
   const side=(i:BridgeSide)=>sideLabel(i,draft);
@@ -218,7 +136,7 @@ export function BridgePage() {
     if(draft.moments.length>=3)return;
     update({moments:[...draft.moments,{scene:'',saw:'',heard:'',felt:''}]});
   };
-  const reset=()=>{const fresh=newBridgeDraft();suppressNextSave.current=true;clearBridgeDraft();setDraft(fresh);setSavedId(null);setReview(null);setShowOffers(false);setCopyNote('');setConfirmDelete(false);};
+  const reset=()=>{const fresh={...newBridgeDraft(),address:draft.address,mode:draft.mode};suppressNextSave.current=true;clearBridgeDraft();setDraft(fresh);setSavedId(null);setReview(null);setShowOffers(false);setCopyNote('');setConfirmDelete(false);};
   const deleteEverything=()=>{deleteAllBridgeData();reset();setCards([]);};
   const save=()=>{
     if(risk)return;
@@ -243,6 +161,7 @@ export function BridgePage() {
   };
   const move=(direction:-1|1)=>{
     if(risk)return;
+    if(direction===-1 && draft.trainingMode==='personal' && draft.step===1){update({trainingMode:'case',step:0});return;}
     if(direction===1 && !canMoveOn(draft))return;
     if(draft.step===7 && direction===1){
       const uneasy=draft.fit==='no'||draft.sensations.includes('tension')||draft.sensations.includes('contraction');
@@ -281,50 +200,12 @@ export function BridgePage() {
   </section>:null;
 
   const renderStep=()=>{
+    if(draft.trainingMode==='case')return <BridgeCaseTrainer
+      draft={draft} onUpdate={update} onReset={reset}
+      onSave={save} onCopy={doCopy} savedId={savedId}
+      copyNote={copyNote} due={due} onReview={startReview} onOwnStory={writeOwnStory}/>;
     switch(draft.step){
-      case 0:return <>
-        <div className="bridge-story-scene" data-testid="bridge-story">
-          <div className="bridge-story-location"><span aria-hidden="true">{story.icon}</span><span>{story.scene}</span></div>
-          <h2>{story.opening}</h2>
-          <div className="bridge-dialogue">
-            <div className="bridge-speech bridge-speech-first">
-              <span className="bridge-speaker">{story.speakerA}</span>
-              <p>״{story.lineA}״</p>
-            </div>
-            <div className="bridge-speech bridge-speech-second">
-              <span className="bridge-speaker">{story.speakerB}</span>
-              <p>״{story.lineB}״</p>
-            </div>
-          </div>
-          <div className="bridge-story-decision">
-            <h3>מה אתה עושה עכשיו?</h3>
-            <div className="bridge-story-options" role="group" aria-label="מה אתה עושה עכשיו?">
-              {STORY_CHOICES[storyIndex].map((option,index)=>
-                <button type="button" key={index} aria-pressed={storyChoice===index} onClick={()=>setStoryChoice(index)}>
-                  <span>{option.label}</span><span className="bridge-option-arrow" aria-hidden="true">←</span>
-                </button>)}
-            </div>
-          </div>
-          {storyChoice!==null&&
-            <div className="bridge-story-result" role="status">
-              <p>{STORY_CHOICES[storyIndex][storyChoice].result}</p>
-              <button type="button" className="bridge-enter-story" onClick={()=>startStory(story)}>
-                ממשיך מכאן <span aria-hidden="true">←</span>
-              </button>
-            </div>}
-        </div>
-        <div className="bridge-story-switch">
-          <button type="button" onClick={()=>{setStoryIndex(i=>(i+1)%ENTRY_STORIES.length);setStoryChoice(null);}}>סיפור אחר <span aria-hidden="true">↻</span></button>
-          <button type="button" onClick={writeOwnStory}>סיפור משלי</button>
-        </div>
-        {due.length>0&&<div className="bridge-due" aria-label="חזרות שממתינות">
-          <strong>הגשרים שלי</strong>
-          {due.slice(0,3).map(entry=><button key={entry.card.id+'-'+entry.day} type="button" onClick={()=>startReview(entry)}>חזרה · יום {entry.day} · {entry.card.draft.chosenName||'הגשר שלי'}</button>)}
-        </div>}
-        {cards.length>0&&<details className="bridge-archive"><summary>הכרטיסים שלי ({cards.length})</summary>
-          {cards.map(card=><p key={card.id}>{card.draft.chosenName||'גשר ללא שם'} · {new Date(card.savedAt).toLocaleDateString('he-IL')}</p>)}
-        </details>}
-      </>;
+      case 0:return <button type="button" className="bridge-primary" onClick={()=>update({trainingMode:'case'})}>בחר שיחה לתרגול</button>;
       case 1:return <>
         <h2>מה שני הדברים שמושכים אותך?</h2>
         <Field id="bridge-side-a" label="מצד אחד" value={draft.sideA} onChange={v=>update({sideA:v})} required placeholder="לכבד את אבא שלי"/>
@@ -493,17 +374,17 @@ export function BridgePage() {
       </div>
 
     </header>
-    {draft.step>0&&<IconTrail draft={draft}/>}
-    {review ? followUp : <section className={draft.step===0?'bridge-stage bridge-stage--story':'bridge-stage'} aria-live="polite" aria-label={STEP_LABELS[draft.step]}>
+    {draft.trainingMode==='personal'&&draft.step>0&&<IconTrail draft={draft}/>}
+    {review ? followUp : <section className={draft.trainingMode==='case'?'bridge-stage bridge-stage--case':'bridge-stage'} aria-live="polite" aria-label={draft.trainingMode==='case'?'תרגול פענוח שיחה':STEP_LABELS[draft.step]}>
       {renderStep()}
-      {draft.mode==='practitioner'&&<PractitionerPanel step={draft.step}/>}
+      {draft.mode==='practitioner'&&<PractitionerPanel step={draft.trainingMode==='case'?Math.min(draft.step+1,9):draft.step}/>}
       {risk&&<div role="alert" className="bridge-warning">
         <strong>עוצרים כאן.</strong>
         <p>הניסוח עשוי לרמוז על סיכון לפגיעה. התרגול אינו מיועד למצבי משבר. כדאי לפנות לאיש מקצוע מתאים, ובסכנה מיידית לשירותי החירום.</p>
         <p>אפשר למחוק הכול או להסיר את הביטוי כדי להמשיך בתרגול אחר.</p>
       </div>}
       {storageFailed&&!risk&&<p role="alert" className="bridge-warning">לא ניתן לשמור מידע בדפדפן הזה. בדוק הרשאות אחסון מקומי.</p>}
-      {draft.step>0&&draft.step<9&&<div className="bridge-actions">
+      {draft.trainingMode==='personal'&&draft.step>0&&draft.step<9&&<div className="bridge-actions">
         {draft.step>0&&<button className="bridge-secondary" type="button" onClick={()=>move(-1)}>חזרה</button>}
         <button className="bridge-primary" type="button" disabled={!canNext} onClick={()=>move(1)}>{draft.step===0?'מתחילים':nextText}</button>
       </div>}
@@ -522,13 +403,15 @@ export function BridgePage() {
           <div className="bridge-options"><button type="button" aria-pressed={draft.mode==='self'} onClick={()=>update({mode:'self'})}>לעצמי</button><button type="button" aria-pressed={draft.mode==='practitioner'} onClick={()=>update({mode:'practitioner'})}>מצב מטפל</button></div>
         </fieldset>
         <p className="bridge-help-privacy">הטקסט וכרטיסי החזרה נשמרים בדפדפן הזה בלבד. אין שימוש במודל AI. זהו תרגול לקונפליקטים יומיומיים, לא סיוע במשבר.</p>
-        <button className="bridge-primary" type="button" onClick={()=>setShowHelp(false)}>חוזרים לסיפור</button>
+        <button className="bridge-primary" type="button" onClick={()=>setShowHelp(false)}>חוזרים לשיחה</button>
+        <div className="bridge-help-delete">
+          <button type="button" className="bridge-link" onClick={()=>{if(confirmDelete){deleteEverything();setShowHelp(false);}else setConfirmDelete(true);}}>
+            {confirmDelete?'אישור מחיקת כל הנתונים מהמכשיר':'מחיקת כל נתוני הגשר מהמכשיר'}
+          </button>
+          {confirmDelete&&<button type="button" className="bridge-link" onClick={()=>setConfirmDelete(false)}>ביטול</button>}
+        </div>
       </section>
     </div>}
-    <footer className="bridge-footer">
-      <button type="button" className="bridge-link" onClick={()=>{if(confirmDelete)deleteEverything();else setConfirmDelete(true);}}>{confirmDelete?'לאישור: מחק הכול מהמכשיר':'מחק הכול'}</button>
-      {confirmDelete&&<button type="button" className="bridge-link" onClick={()=>setConfirmDelete(false)}>ביטול המחיקה</button>}
 
-    </footer>
   </div>;
 }

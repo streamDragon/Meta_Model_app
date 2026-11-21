@@ -16,6 +16,8 @@ export interface BridgeMoment {
 export interface BridgeDraft {
   address: Address;
   mode: BridgeMode;
+  trainingMode: 'case' | 'personal';
+  caseId: 'moshe' | 'noa' | 'daniel' | null;
   step: number;
   sideA: string;
   sideB: string;
@@ -52,7 +54,7 @@ export const BRIDGE_REVIEW_DAYS = [1, 3, 7] as const;
 export const EMPTY_MOMENT: BridgeMoment = {scene:'', saw:'', heard:'', felt:''};
 export function newBridgeDraft(): BridgeDraft {
   return {
-    address:'m', mode:'self', step:0,
+    address:'m', mode:'self', trainingMode:'case', caseId:null, step:0,
     sideA:'', sideB:'', valueA:'', valueB:'', trigger:'',
     inventorySide:'b', moments:[{...EMPTY_MOMENT}], momentAttempt:0,
     bridgeAnswer:'', chosenName:'', sensations:[], fit:'',
