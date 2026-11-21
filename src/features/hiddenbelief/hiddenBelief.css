@@ -1,0 +1,48 @@
+.hbx-page {max-width:880px;margin:auto;padding:clamp(12px,2.5vw,28px);display:grid;gap:18px;color:var(--ink,#25344b);direction:rtl}
+.hbx-page *{box-sizing:border-box}
+.hbx-heading{display:grid;gap:8px}
+.hbx-heading h2{font-size:clamp(1.55rem,3.5vw,2.1rem);margin:0}
+.hbx-heading p{max-width:670px;line-height:1.6;color:var(--ink-soft,#607083);margin:0}
+.hbx-eyebrow{font-size:.77rem;color:#6254a8;font-weight:700}
+.hbx-mode{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hbx-mode button{min-height:48px;border-radius:12px;border:1px solid #dbe1e9;background:#fff;color:#425269;font:inherit;cursor:pointer}
+.hbx-mode button.active{background:#ece9ff;border-color:#8376c9;color:#3e327b;font-weight:750}
+.hbx-entry{display:grid;gap:12px;padding:clamp(15px,3vw,23px);border-radius:19px;border:1px solid #dfe4ee;background:#fff}
+.hbx-entry-head,.hbx-results-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hbx-controls{display:flex;gap:12px;align-items:center}
+.hbx-link{border:0;background:transparent;color:#5042aa;cursor:pointer;font:inherit;font-size:.85rem;text-decoration:underline;text-underline-offset:3px}
+.hbx-small{font-size:.82rem;color:var(--ink-soft,#66768a);line-height:1.5}
+.hbx-entry textarea,.hbx-entry input{width:100%;min-width:0;font:inherit;font-size:1rem;line-height:1.6;padding:12px;border:1px solid #cad3e1;background:#fafdff;color:#203147;border-radius:11px;resize:vertical}
+.hbx-entry textarea:focus-visible,.hbx-entry input:focus-visible{outline:2px solid #8574dc;outline-offset:1px}
+.hbx-entry label{font-size:.89rem}
+.hbx-details{border:1px solid #e3e7ee;padding:9px 12px;border-radius:11px;font-size:.87rem;line-height:1.6}
+.hbx-details summary{cursor:pointer;font-weight:700;color:#54469b}
+.hbx-details blockquote{padding:9px 10px;margin:8px 0;border-right:3px solid #b7acdb;background:#fafaff;overflow-wrap:anywhere}
+.hbx-training{display:grid;gap:9px;border-top:1px solid #e7eaf0;padding-top:13px}
+.hbx-training p{color:#66768a;font-size:.8rem}
+.hbx-privacy{font-size:.79rem;line-height:1.6;background:#edf8f4;padding:10px 12px;border-radius:10px;color:#225a4a}
+.hbx-alert{padding:14px;background:#fff5e8;border:1px solid #ddb778;border-radius:11px;line-height:1.6;color:#643f13}
+.hbx-primary{background:#6756d8;border:0;border-radius:12px;color:#fff;font:inherit;font-weight:750;min-height:50px;padding:10px 18px;cursor:pointer}
+.hbx-primary:disabled{background:#abb1bc;cursor:not-allowed}
+.hbx-results{display:grid;gap:13px}
+.hbx-results h3{font-size:1.3rem;margin:4px 0}
+.hbx-card{padding:clamp(15px,2.5vw,22px);display:grid;gap:13px;border:1px solid #e1e5ed;border-radius:17px;background:#fff}
+.hbx-card-top{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.hbx-pill,.hbx-tag{font-size:.76rem;border-radius:999px;padding:5px 9px;font-weight:700;background:#f3eefa;color:#59458f}
+.hbx-pill{background:#fff5df;color:#815c23}
+.hbx-card h4{font-size:1.08rem;margin:0}
+.hbx-equation{border-right:3px solid #816dc2;background:#f7f5ff;padding:12px;border-radius:9px}
+.hbx-equation small,.hbx-next small{display:block;color:#685987;font-size:.78rem}
+.hbx-equation p{margin:5px 0 0;line-height:1.65;font-weight:650}
+.hbx-next{display:grid;gap:5px}
+.hbx-next strong{font-size:1rem;line-height:1.5}
+.hbx-body-prompt,.hbx-row-note{font-size:.84rem;line-height:1.6;color:#315b65}
+.hbx-review{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.hbx-review span{font-size:.8rem;color:#627388;margin-left:5px}
+.hbx-review button{font:inherit;font-size:.81rem;border:1px solid #d3d9e4;background:#fff;color:#374760;border-radius:10px;padding:9px 11px;cursor:pointer;min-height:39px}
+.hbx-review button[aria-pressed=true]{background:#e5f3ec;color:#246044;border-color:#83c7a4;font-weight:750}
+.hbx-review-note{font-size:.82rem;color:#376656}
+.hbx-empty,.hbx-reflection{padding:15px;border-radius:13px;background:#f4f7fb;line-height:1.6}
+.hbx-reflection p{font-size:.88rem;overflow-wrap:anywhere;margin:7px 0}
+.hbx-disclaimer{font-size:.78rem;color:#69788a;line-height:1.5;padding-bottom:35px}
+@media(max-width:520px){.hbx-page{gap:12px}.hbx-entry{gap:10px}.hbx-controls{gap:7px}.hbx-link{font-size:.77rem}.hbx-review button{flex:1}.hbx-mode button{font-size:.9rem}}
