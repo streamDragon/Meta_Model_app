@@ -59,8 +59,21 @@ function Field({id,label,value,onChange,placeholder='',required=false,rows=0}:{i
       :<input id={id} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} maxLength={450} required={required}/>}
   </label>;
 }
-function PractitionerPanel({step}:{step:number}) {
-  const t=THEORY[step];
+const CASE_THEORY:Record<number,{title:string;description:string}>={
+  0:{title:'זיהוי המלכוד',description:'לפני פירוש, שמים לב לדרישות הסותרות, למחיר הכרוך בכל בחירה ולתחושת חוסר האפשרות לדבר על כך. בייטסון ועמיתיו תיארו זאת כמבנה תקשורתי, ולא כאבחנה של אדם.'},
+  1:{title:'איסור על מטא־תקשורת',description:'הנעילה נוצרת כשגם שיחה על הסתירה נתפסת כהפרת הכללים. את הבירור עושים בעדינות, תוך הבחנה בין חוויה סובייקטיבית לבין כפייה או איום בפועל.'},
+  2:{title:'דיאלקטיקה ותיקוף',description:'מחפשים היגיון ואמת חלקית בחוויה של כל צד. תיקוף אינו הצהרה שכל טענה נכונה או שיש סימטריה ביחסי כוח.'},
+  3:{title:'משאב מתוך חוויה קיימת',description:'מחפשים רגע ממשי ולא ממציאים פתרון. כאן משתמשים במידע חווייתי ולא בניסוח מופשט בלבד.'},
+  4:{title:'השהיה חווייתית',description:'מבחינים בפרטים חושיים של חוויה שממחישים יכולת קיימת; אין חובה לחוות שינוי גופני מסוים.'},
+  5:{title:'מעבר לרמת הכלל',description:'שאלת המטפל בוחנת את הקשר הנוקשה בין מושגים, כגון ״כבוד = ציות״. זו רמת מטא, ולא הכרעה מי צודק.'},
+  6:{title:'אפשרות חדשה, לא פיוס כפוי',description:'אחרי פתיחת הכלל אפשר לחקור חיבור בין ערכים, הצבת גבול או התרחקות בטוחה. אין חובה להגיע ל״גם״.'},
+  7:{title:'ניסוח במילות האדם',description:'המשמעות החדשה היא השערה לבדיקה, לא פרשנות סמכותית של המטפל.'},
+  8:{title:'Resonating ובדיקת התאמה',description:'בודקים איך האדם מגיב לשם. תחושת גוף היא מידע על חווייתו, לא הוכחה לעובדה או אבחנה.'},
+  9:{title:'בדיקת תוצאה במציאות',description:'מחפשים מה נעשה בפועל ומה נותר קשה. מדדים עצמיים אינם עדות ליעילות טיפולית.'},
+  10:{title:'אינטגרציה וחזרה',description:'משחזרים את שרשרת ההבנה, מזהים את הכלל שהשתנה וחוזרים לבדיקה מאוחרת.'},
+};
+function PractitionerPanel({step,caseMode=false}:{step:number;caseMode?:boolean}) {
+  const t=(caseMode?CASE_THEORY:THEORY)[step];
   if(!t)return null;
   return <details className="bridge-theory"><summary>🧭 מה עשינו כאן? · למטפלים</summary>
     <strong>{t.title}</strong><p>{t.description}</p>
@@ -387,7 +400,7 @@ export function BridgePage() {
     {draft.trainingMode==='personal'&&draft.step>0&&<IconTrail draft={draft}/>}
     {review ? followUp : <section className={draft.trainingMode==='case'?'bridge-stage bridge-stage--case':'bridge-stage'} aria-live="polite" aria-label={draft.trainingMode==='case'?'תרגול פענוח שיחה':STEP_LABELS[draft.step]}>
       {renderStep()}
-      {draft.mode==='practitioner'&&<PractitionerPanel step={draft.trainingMode==='case'?Math.min(draft.step+1,9):draft.step}/>}
+      {draft.mode==='practitioner'&&<PractitionerPanel step={draft.step} caseMode={draft.trainingMode==='case'}/>}
       {risk&&<div role="alert" className="bridge-warning">
         <strong>עוצרים כאן.</strong>
         <p>הניסוח עשוי לרמוז על סיכון לפגיעה. התרגול אינו מיועד למצבי משבר. כדאי לפנות לאיש מקצוע מתאים, ובסכנה מיידית לשירותי החירום.</p>
@@ -408,6 +421,15 @@ export function BridgePage() {
         <div className="bridge-intro-content">
           <h2 id="bridge-help-title">התמודדות עם Double Bind</h2>
           <p id="bridge-help-description">מלכוד כפול אינו רק בחירה קשה. שתי דרישות סותרות יכולות לנעול אדם בתוך שדה שבו אפילו לדבר על הסתירה או לצאת מהמצב מרגיש אסור. בתרגיל נלמד לזהות את הנעילה, לתת מקום לאמת החלקית בכל צד ולפתוח מחדש את כללי המשחק.</p>
+          <div className="bridge-intro-flow" role="img" aria-label="שתי דרישות סותרות יוצרות מלכוד; בדיקת הכלל פותחת דרך חדשה">
+            <div className="bridge-intro-flow-poles">
+              <span>דרישה א׳</span><span>דרישה ב׳</span>
+            </div>
+            <div className="bridge-intro-flow-arrows" aria-hidden="true">↘ &nbsp; ↙</div>
+            <div className="bridge-intro-flow-lock">🔒 אי אפשר לבחור, וגם קשה לדבר על הסתירה</div>
+            <div className="bridge-intro-flow-arrows" aria-hidden="true">↓</div>
+            <div className="bridge-intro-flow-open">🔓 משנים את הכלל, לא מכריחים לבחור</div>
+          </div>
           <div className="bridge-intro-example" aria-label="דוגמה להמחשת Double Bind">
             <div className="bridge-intro-or"><span>שתי דרישות ומחסום</span><p>״אם אני לא מציית לאבא, אני בן לא מכבד; אם אני מציית, אני לא האב שאני רוצה להיות. אפילו לדבר על זה נחשב בעיניי חוסר כבוד.״</p></div>
             <div className="bridge-intro-question"><span>יוצאים מן השדה</span><p>״מי קבע שכבוד מחייב הסכמה עם כל עצה?״ אחרי שנפתח מרחב לחשוב על הכלל: ״כשאתה מקשיב ליוסי, איך ערך הכבוד יכול להיות שם גם?״</p></div>

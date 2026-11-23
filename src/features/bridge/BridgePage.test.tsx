@@ -26,6 +26,8 @@ function chooseCorrect(){
     screen.queryByText(/איך תעזור ל/) ?c.bridgeOptions:
     screen.queryByText('מה תגיד עכשיו?')?c.bodyOptions:c.testOptions;
   fireEvent.click(within(group).getByRole('button',{name:new RegExp(current.find(o=>o.best)!.label.slice(0,10))}));
+  expect(screen.getByRole('region',{name:'מה גילית ולמה זה חשוב'})).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:/ממשיך לשיחה/}));
 }
 function playUntilSummary(){
   render(<BridgePage/>);
@@ -82,6 +84,42 @@ describe('Bridge guided case trainer',()=>{
    chooseCorrect();
    expect(screen.getByText('מה מונע ממנו לצאת מהמלכוד?')).toBeTruthy();
  });
+ it('explains a correct choice before moving, including a visual map and next action',()=>{
+   render(<BridgePage/>);
+   const choices=screen.getByRole('group',{name:'בחר את התגובה המתאימה'});
+   const right=BRIDGE_CASES[0].orOptions.find(o=>o.best)!;
+   fireEvent.click(within(choices).getByRole('button',{name:new RegExp(right.label.slice(0,12))}));
+   expect(screen.getByText('איפה המלכוד?')).toBeTruthy();
+   const insight=screen.getByRole('region',{name:'מה גילית ולמה זה חשוב'});
+   expect(within(insight).getByText('למה זה חשוב לשיחה?')).toBeTruthy();
+   expect(within(insight).getByText('מה קורה עכשיו?')).toBeTruthy();
+   expect(within(insight).getByRole('img',{name:/מפת המלכוד/})).toBeTruthy();
+   expect(screen.queryByRole('progressbar')).toBeNull();
+   fireEvent.click(within(insight).getByRole('button',{name:/ממשיך לשיחה/}));
+   expect(screen.getByText('מה מונע ממנו לצאת מהמלכוד?')).toBeTruthy();
+ });
+ it('makes a wrong answer recoverable and provides guided decoding instead of trapping the learner',()=>{
+   render(<BridgePage/>);
+   const choices=screen.getByRole('group',{name:'בחר את התגובה המתאימה'});
+   fireEvent.click(within(choices).getByRole('button',{name:/אבא שלו צודק/}));
+   const msg=screen.getByRole('status');
+   expect(within(msg).getByText('יש כאן משהו שעדיין חסר')).toBeTruthy();
+   fireEvent.click(within(msg).getByRole('button',{name:'הראה לי את הפענוח'}));
+   expect(screen.getByText('פענוח מודרך')).toBeTruthy();
+   expect(screen.getByText('איפה המלכוד?')).toBeTruthy();
+   fireEvent.click(screen.getByRole('button',{name:/ממשיך לשיחה/}));
+   expect(screen.getByText('מה מונע ממנו לצאת מהמלכוד?')).toBeTruthy();
+ });
+ it('allows another attempt after a mistaken answer, without a score or restart',()=>{
+   render(<BridgePage/>);
+   const choices=screen.getByRole('group',{name:'בחר את התגובה המתאימה'});
+   fireEvent.click(within(choices).getByRole('button',{name:/יוסי שובר דברים/}));
+   fireEvent.click(screen.getByRole('button',{name:'מנסה תשובה אחרת'}));
+   expect(screen.queryByText('יש כאן משהו שעדיין חסר')).toBeNull();
+   const correct=BRIDGE_CASES[0].orOptions.find(o=>o.best)!;
+   fireEvent.click(within(screen.getByRole('group',{name:'בחר את התגובה המתאימה'})).getByRole('button',{name:new RegExp(correct.label.slice(0,10))}));
+   expect(screen.getByRole('region',{name:'מה גילית ולמה זה חשוב'})).toBeTruthy();
+ });
  it('recognizes blocked exit and asks a meta question before allowing the bridge',()=>{
    render(<BridgePage/>);
    chooseCorrect();
@@ -94,7 +132,7 @@ describe('Bridge guided case trainer',()=>{
    expect(screen.getByText('על איזה כלל אפשר לדבר מחדש?')).toBeTruthy();
    expect(screen.queryByText(/איך תעזור ל/)).toBeNull();
    chooseCorrect();
-   expect(screen.getByText('מרחב חדש')).toBeTruthy();
+   expect(screen.getByText(/מה השתנה\? לא האדם, אלא הכלל/)).toBeTruthy();
    expect(screen.getByText(/לכבד אדם גם בלי להסכים/)).toBeTruthy();
  });
  it('does not confuse a plain dilemma with a communication double bind in the intro',()=>{

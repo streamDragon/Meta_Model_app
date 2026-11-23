@@ -68,5 +68,21 @@ for(const step of steps){
   const viewportName='bridge_step_'+step+'_390x844.png';
   fs.writeFileSync(path.join(dst,viewportName),Buffer.from(viewport.data,'base64'));
   console.log('CAPTURED '+name+' and '+viewportName);
+  if(step===0||step===5) {
+    const needle=step===0?'שתי נאמנויות מתנגשות':'כשאתה אומר';
+    const click=await call('Runtime.evaluate',{expression:
+      '(() => { const b=[...document.querySelectorAll(".bridge-case-choices button")].find(x=>x.textContent.includes('+JSON.stringify(needle)+'));if(!b)return "missing answer";b.click();return "clicked";})()',
+      returnByValue:true});
+    if(click.result?.value!=='clicked')throw new Error('QA answer button not found '+step);
+    await pause(400);
+    const verify=await call('Runtime.evaluate',{expression:
+      "({insight:!!document.querySelector('.bridge-choice-discovery'),map:!!document.querySelector('.bridge-insight-map'),continue:!!document.querySelector('.bridge-case-continue')})",
+      returnByValue:true});
+    if(!verify.result?.value?.insight||!verify.result?.value?.continue||!verify.result?.value?.map)
+      throw new Error('QA result not visible after correct answer at '+step+': '+JSON.stringify(verify.result?.value));
+    const feedbackCapture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,fromSurface:true});
+    fs.writeFileSync(path.join(dst,'bridge_feedback_'+step+'_390px.png'),Buffer.from(feedbackCapture.data,'base64'));
+    console.log('CAPTURED bridge_feedback_'+step+'_390px.png');
+  }
 }
 await ws.close();

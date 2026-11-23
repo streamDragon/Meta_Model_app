@@ -1,6 +1,7 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
+import {BridgeInsightMap} from './BridgeInsightMap';
 import type {BridgeDraft} from './bridgeEngine';
-import {BRIDGE_CASES, findBridgeCase, type BridgeCaseId, type BridgeDialogueTurn, type BridgeOption} from './bridgeCases';
+import {BRIDGE_CASES, findBridgeCase, type BridgeLearningCase, type BridgeCaseId, type BridgeDialogueTurn, type BridgeOption} from './bridgeCases';
 import type {DueBridgeReview} from '../../store/bridgeStore';
 
 function Conversation({turns,clientName}:{turns:BridgeDialogueTurn[];clientName:string}) {
@@ -15,17 +16,125 @@ function Conversation({turns,clientName}:{turns:BridgeDialogueTurn[];clientName:
   </div>;
 }
 
-function ChoiceSet({options,onSelect,feedback,seed}:{options:readonly BridgeOption[];onSelect:(option:BridgeOption)=>void;feedback:string;seed:number}) {
-  // Mix the fixed answer order by case and question; the correct choice is not
-  // consistently at the first position.
+type LearningInsight={
+  title:string;why:string;next:string;evidence:string;
+  phase:'trap'|'values'|'unlock';showMap:boolean;
+};
+
+function lessonFor(scenario:BridgeLearningCase,stage:number):LearningInsight {
+  const common={phase:'trap' as const,showMap:false};
+  switch(stage){
+    case 0:return {
+      title:'המלכוד אינו רק שתי אפשרויות',
+      why:'הוא לא רק מתלבט: גם הניסיון לדבר על הסתירה מרגיש אסור. לכן עוד בחירה בתוך אותו ״או״ לא משחררת.',
+      next:'נבדוק מה בדיוק סוגר את הדרך החוצה.',
+      evidence:scenario.dialogue[scenario.dialogue.length-1]?.text||'',phase:'trap',showMap:true,
+    };
+    case 1:return {
+      title:'זה המנעול של המלכוד',
+      why:'כשגם שיחה על הסתירה נחשבת לבעיה, האדם לא יכול לבחון את הכללים שמחייבים אותו לבחור.',
+      next:'נקשיב למה שכל צד מנסה לשמור עליו.',
+      evidence:scenario.lock[scenario.lock.length-1]?.text||'',phase:'trap',showMap:true,
+    };
+    case 2:return {
+      title:'תיקוף אינו הסכמה לכל טענה',
+      why:'אפשר להבין מה כל צד מבקש להגן עליו, בלי להניח ששתי הדרישות מוצדקות או שהצדדים מחזיקים באותו כוח.',
+      next:'נחפש רגע אמיתי שבו האדם כבר הפעיל משאב חשוב.',
+      evidence:scenario.inquiry.filter(x=>x.speaker==='client').map(x=>x.text).join('  •  '),
+      phase:'values',showMap:true,
+    };
+    case 3:return {
+      ...common,title:'דוגמה ממשית במקום פתרון מומצא',
+      why:'רגע שקרה באמת מספק פרטים על מה שהאדם כבר יכול לעשות. לא צריך להמציא הצלחה מושלמת.',
+      next:'נשהה עם הרגע, ונבחן מה ראה, שמע והרגיש.',
+      evidence:scenario.memory[scenario.memory.length-1]?.text||'',
+    };
+    case 5:return {
+      title:'זה התיקון: משנים רמת שאלה',
+      why:'לא שואלים מי מהצדדים מנצח. שואלים אם הכלל שמייצר את ההתנגשות באמת מחייב. זה פותח אפשרויות חדשות.',
+      next:'נראה איזו דרך חדשה מתאפשרת, ואחר כך נבדוק אם שאלה של ״גם״ מתאימה.',
+      evidence:scenario.lock[scenario.lock.length-1]?.text||'',phase:'unlock',showMap:true,
+    };
+    case 6:return {
+      title:'הגשר הוא אפשרות, לא חובה',
+      why:'אחרי שבוחנים את הכלל הנוקשה, אפשר להזמין חיבור בין ערכים. לפעמים נכון יותר להציב גבול או לבחור מרחק בטוח.',
+      next:'נשמע איך המטופל מגיב להצעה, ולא נניח מראש שהיא הצליחה.',
+      evidence:scenario.escapeRule,phase:'unlock',showMap:true,
+    };
+    case 8:return {
+      ...common,title:'התגובה בגוף היא מידע, לא פסק דין',
+      why:'כשמשהו מתכווץ או מרגיש לא שלם, מתעניינים במה שעוד זקוק להכרה; לא דוחפים את האדם להסכים.',
+      next:'נבדוק מה באמת קרה כשפגש שוב את המצב.',
+      evidence:scenario.body[scenario.body.length-1]?.text||'',
+    };
+    case 9:return {
+      ...common,title:'בודקים שינוי בחיים, לא רק תחושת הקלה',
+      why:'מתארים מה האדם עשה אחרת, מה נשאר קשה, ומה ניתן לבדוק בפעם הבאה. אין כאן הבטחה לריפוי.',
+      next:'נסכם מה זיהינו, איזה כלל נפתח ומה נבדק.',
+      evidence:scenario.test[scenario.test.length-1]?.text||'',
+    };
+    default:return {...common,title:'לגלות, לא לנחש',why:'התשובה נשענת על דברי האדם ולא על הנחה מוקדמת.',
+      next:'נמשיך לשיחה ונבדוק את השלב הבא.',evidence:''};
+  }
+}
+
+function ChoiceSet({options,onSelect,seed,lesson,scenario}:{
+  options:readonly BridgeOption[];
+  onSelect:(option:BridgeOption)=>void;
+  seed:number;
+  lesson:LearningInsight;
+  scenario:BridgeLearningCase;
+}) {
+  const [selected,setSelected]=useState<BridgeOption|null>(null);
+  const [reveal,setReveal]=useState(false);
+  const resultRef=useRef<HTMLDivElement|null>(null);
   const rotation=seed%options.length;
   const ordered=[...options.slice(rotation),...options.slice(0,rotation)];
-  return <div className="bridge-case-choices" role="group" aria-label="בחר את התגובה המתאימה">
-    {ordered.map((option,index)=>
-      <button key={index} type="button" onClick={()=>onSelect(option)}>
-        <span>{option.label}</span><span aria-hidden="true">←</span>
-      </button>)}
-    {feedback&&<p className="bridge-case-feedback" role="status">{feedback}</p>}
+  const best=options.find(option=>option.best);
+  const solved=selected?.best===true||reveal;
+  useEffect(()=>{
+    if(selected||reveal){
+      resultRef.current?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+    }
+  },[selected,reveal]);
+  return <div className="bridge-choice-workspace">
+    <div className="bridge-case-choices" role="group" aria-label="בחר את התגובה המתאימה">
+      {ordered.map((option,index)=>
+        <button key={index} type="button" aria-pressed={selected===option}
+          disabled={solved} onClick={()=>{setSelected(option);setReveal(false);}}>
+          <span>{option.label}</span><span aria-hidden="true">{selected===option?(option.best?'✓':'↶'):'←'}</span>
+        </button>)}
+    </div>
+    {!selected&&!reveal&&<button className="bridge-case-own" type="button"
+      onClick={()=>setReveal(true)}>לא בטוח? הראה לי איך מפענחים</button>}
+    {!solved&&selected&&<div ref={resultRef} className="bridge-choice-error" role="status">
+      <strong>יש כאן משהו שעדיין חסר</strong>
+      <p>{selected.feedback}</p>
+      <details className="bridge-evidence"><summary>חזור למה ש{scenario.name} אמר</summary><p>״{lesson.evidence}״</p></details>
+      <div className="bridge-choice-error-actions">
+        <button type="button" onClick={()=>setSelected(null)}>מנסה תשובה אחרת</button>
+        <button type="button" onClick={()=>setReveal(true)}>הראה לי את הפענוח</button>
+      </div>
+    </div>}
+    {solved&&best&&<section className="bridge-choice-discovery" ref={resultRef}
+      aria-label="מה גילית ולמה זה חשוב" role="region" aria-live="polite">
+      <span className="bridge-choice-eyebrow">{reveal?'פענוח מודרך':'מה גילית עכשיו?'}</span>
+      <h4>{lesson.title}</h4>
+      <p className="bridge-choice-answer">{best.label}</p>
+      <div className="bridge-choice-explained">
+        <strong>למה זו התשובה?</strong>
+        <p>{best.feedback}</p>
+        <strong>למה זה חשוב לשיחה?</strong>
+        <p>{lesson.why}</p>
+      </div>
+      {lesson.evidence&&<details className="bridge-evidence">
+        <summary>המשפט שעליו הסתמכנו</summary><p>״{lesson.evidence}״</p>
+      </details>}
+      {lesson.showMap&&<BridgeInsightMap scenario={scenario} phase={lesson.phase}/>}
+      <div className="bridge-next-prompt"><strong>מה קורה עכשיו?</strong><p>{lesson.next}</p></div>
+      <button className="bridge-case-continue" type="button"
+        onClick={()=>onSelect(best)}>ממשיך לשיחה ←</button>
+    </section>}
   </div>;
 }
 
@@ -46,23 +155,18 @@ export function BridgeCaseTrainer({
   draft,onUpdate,onReset,onSave,onCopy,savedId,copyNote,due,onReview,onOwnStory,
 }:Props) {
   const [caseId,setCaseId]=useState<BridgeCaseId>(draft.caseId||'moshe');
-  const [feedback,setFeedback]=useState('');
   const [showEditName,setShowEditName]=useState(false);
   const scenario=findBridgeCase(draft.caseId||caseId);
   const orderSeed=(BRIDGE_CASES.findIndex(item=>item.id===scenario.id)+1)*2+draft.step;
 
-  useEffect(()=>{setFeedback('');},[draft.step,draft.caseId]);
-
   const proceed=(step:number,patch:Partial<BridgeDraft>={})=>{
-    setFeedback('');
     onUpdate({step,...patch});
   };
   const choose=(option:BridgeOption,step:number,patch:Partial<BridgeDraft>={})=>{
     if(option.best)proceed(step,patch);
-    else setFeedback(option.feedback);
   };
   const changeCase=(next:BridgeCaseId)=>{
-    setCaseId(next);setFeedback('');
+    setCaseId(next);
     // Do not preserve partially entered patient text when changing fictional cases.
     onUpdate({
       step:0,caseId:next,sideA:'',sideB:'',valueA:'',valueB:'',trigger:'',
@@ -71,6 +175,8 @@ export function BridgeCaseTrainer({
     });
   };
   const firstScene=draft.step===0;
+  const contextLabels=['','איך ננעלת הדרך?','מה חשוב בכל צד?','המשאב שכבר קיים','רגע של הקשבה',
+    'איזה כלל נוכל לבחון?','מה נפתח כשמשנים כלל?','איך השאלה משפיעה?','מה קורה בגוף?','מה קורה במציאות?','מה למדנו?'];
   const back=()=>{
     if(draft.step===0){onReset();return;}
     proceed(draft.step-1);
@@ -80,16 +186,23 @@ export function BridgeCaseTrainer({
     return {...turn,text:turn.text.replace(/״[^״]*״/,'״'+draft.chosenName+'״')};
   });
   return <div className="bridge-case-trainer">
+    {!firstScene&&draft.step<10&&<div className="bridge-case-context">
+      <span>{scenario.name} · {contextLabels[draft.step]}</span>
+      <details className="bridge-case-recap">
+        <summary>לא זוכר את תחילת השיחה?</summary>
+        <Conversation turns={scenario.dialogue} clientName={scenario.name}/>
+      </details>
+    </div>}
     {firstScene&&<div className="bridge-case-picker" role="group" aria-label="בחר מקרה תרגול">
       {BRIDGE_CASES.map(item=><button key={item.id} type="button" aria-pressed={scenario.id===item.id} onClick={()=>changeCase(item.id)}>
         {item.label}
       </button>)}
     </div>}
     {draft.step===0&&<>
-      <div className="bridge-case-heading"><span className="bridge-case-kicker">{scenario.scene}</span><h2>משהו בשיחה לא מסתדר...</h2></div>
+      <div className="bridge-case-heading"><span className="bridge-case-kicker">{scenario.scene} · אתה המטפל</span><h2>משהו בשיחה לא מסתדר...</h2></div>
       <Conversation turns={scenario.dialogue} clientName={scenario.name}/>
       <h3 className="bridge-case-question">איפה המלכוד?</h3>
-      <ChoiceSet options={scenario.orOptions} seed={orderSeed} feedback={feedback} onSelect={option=>choose(option,1,{
+      <ChoiceSet options={scenario.orOptions} key={scenario.id+'-'+draft.step} seed={orderSeed} lesson={lessonFor(scenario,draft.step)} scenario={scenario} onSelect={option=>choose(option,1,{
         caseId:scenario.id,trainingMode:'case',sideA:scenario.values.sideA,sideB:scenario.values.sideB,
         valueA:scenario.values.valueA,valueB:scenario.values.valueB,trigger:scenario.values.trigger,
         moments:[scenario.moment],inventorySide:'b',
@@ -102,22 +215,23 @@ export function BridgeCaseTrainer({
     {draft.step===1&&<>
       <Conversation turns={scenario.lock} clientName={scenario.name}/>
       <h3 className="bridge-case-question">מה מונע ממנו לצאת מהמלכוד?</h3>
-      <ChoiceSet options={scenario.lockOptions} seed={orderSeed} feedback={feedback} onSelect={option=>choose(option,2)}/>
+      <ChoiceSet options={scenario.lockOptions} key={scenario.id+'-'+draft.step} seed={orderSeed} lesson={lessonFor(scenario,draft.step)} scenario={scenario} onSelect={option=>choose(option,2)}/>
     </>}
     {draft.step===2&&<>
       <Conversation turns={scenario.inquiry} clientName={scenario.name}/>
       <h3 className="bridge-case-question">איזו אמת חלקית יש בכל צד?</h3>
-      <ChoiceSet options={scenario.valueOptions} seed={orderSeed} feedback={feedback} onSelect={option=>choose(option,3)}/>
+      <ChoiceSet options={scenario.valueOptions} key={scenario.id+'-'+draft.step} seed={orderSeed} lesson={lessonFor(scenario,draft.step)} scenario={scenario} onSelect={option=>choose(option,3)}/>
     </>}
     {draft.step===3&&<>
       <Conversation turns={scenario.memory} clientName={scenario.name}/>
       <h3 className="bridge-case-question">איזה רגע כדאי לקחת לגשר?</h3>
-      <ChoiceSet options={scenario.memoryOptions} seed={orderSeed} feedback={feedback} onSelect={option=>choose(option,4,{moments:[scenario.moment],inventorySide:'b'})}/>
+      <ChoiceSet options={scenario.memoryOptions} key={scenario.id+'-'+draft.step} seed={orderSeed} lesson={lessonFor(scenario,draft.step)} scenario={scenario} onSelect={option=>choose(option,4,{moments:[scenario.moment],inventorySide:'b'})}/>
     </>}
     {draft.step===4&&<>
       <div className="bridge-case-pause">
         <span className="bridge-case-kicker">הרגע שלו</span>
         <h2>הוא כבר ידע לעשות את זה.</h2>
+        <p className="bridge-case-pause-note">זה לא פתר את המלכוד. זה רגע אמיתי שמראה איזה כוח כבר יש לו.</p>
         <p className="bridge-case-pause-quote">״{scenario.moment.scene}״</p>
         <div className="bridge-case-senses">
           <div><span>ראה</span><p>{scenario.moment.saw}</p></div>
@@ -130,13 +244,13 @@ export function BridgeCaseTrainer({
     {draft.step===5&&<>
       <div className="bridge-case-kicker">יוצאים מן השדה: מטא־תקשורת</div>
       <h2 className="bridge-case-title">על איזה כלל אפשר לדבר מחדש?</h2>
-      <ChoiceSet options={scenario.metaOptions} seed={orderSeed} feedback={feedback} onSelect={option=>choose(option,6)}/>
+      <ChoiceSet options={scenario.metaOptions} key={scenario.id+'-'+draft.step} seed={orderSeed} lesson={lessonFor(scenario,draft.step)} scenario={scenario} onSelect={option=>choose(option,6)}/>
     </>}
     {draft.step===6&&<>
-      <div className="bridge-case-escape" role="note"><strong>מרחב חדש</strong><p>{scenario.escapeRule}</p><small>איננו כופים השלמה: לפעמים הפתרון הוא גבול או מרחק בטוח, ולא ״גם״.</small></div>
+      <div className="bridge-case-escape" role="note"><strong>מה השתנה? לא האדם, אלא הכלל שמגביל אותו.</strong><p>{scenario.escapeRule}</p><small>עכשיו יש דרך נוספת לבדוק את המצב. לפעמים הפתרון הוא גבול או מרחק בטוח, ולא ״גם״.</small></div>
       <div className="bridge-case-kicker">שאלת הגשר היא אפשרות אחת, אחרי שהמסגרת נפתחה</div>
       <h2 className="bridge-case-title">איך תעזור ל{scenario.name} למצוא ״גם״?</h2>
-      <ChoiceSet options={scenario.bridgeOptions} seed={orderSeed} feedback={feedback} onSelect={option=>choose(option,7,{bridgeAnswer:scenario.bridgeAnswer})}/>
+      <ChoiceSet options={scenario.bridgeOptions} key={scenario.id+'-'+draft.step} seed={orderSeed} lesson={lessonFor(scenario,draft.step)} scenario={scenario} onSelect={option=>choose(option,7,{bridgeAnswer:scenario.bridgeAnswer})}/>
     </>}
     {draft.step===7&&<>
       <Conversation turns={[
@@ -162,12 +276,12 @@ export function BridgeCaseTrainer({
     {draft.step===8&&<>
       <Conversation turns={nameForBody} clientName={scenario.name}/>
       <h3 className="bridge-case-question">מה תגיד עכשיו?</h3>
-      <ChoiceSet options={scenario.bodyOptions} seed={orderSeed} feedback={feedback} onSelect={option=>choose(option,9,{fit:'almost',needToKnow:option.label})}/>
+      <ChoiceSet options={scenario.bodyOptions} key={scenario.id+'-'+draft.step} seed={orderSeed} lesson={lessonFor(scenario,draft.step)} scenario={scenario} onSelect={option=>choose(option,9,{fit:'almost',needToKnow:option.label})}/>
     </>}
     {draft.step===9&&<>
       <Conversation turns={scenario.test} clientName={scenario.name}/>
       <h3 className="bridge-case-question">איך תבדוק שהגשר עובד בחיים?</h3>
-      <ChoiceSet options={scenario.testOptions} seed={orderSeed} feedback={feedback} onSelect={option=>choose(option,10,{
+      <ChoiceSet options={scenario.testOptions} key={scenario.id+'-'+draft.step} seed={orderSeed} lesson={lessonFor(scenario,draft.step)} scenario={scenario} onSelect={option=>choose(option,10,{
         beforePull:scenario.before,afterPull:scenario.after,difference:scenario.difference,
         nextAction:scenario.nextAction,
       })}/>
@@ -178,7 +292,7 @@ export function BridgeCaseTrainer({
         <h2>{draft.chosenName||scenario.names[0]}</h2>
         <div className="bridge-case-link"><span>{scenario.values.valueA}</span><strong>וגם</strong><span>{scenario.values.valueB}</span></div>
         <div className="bridge-case-summary-block"><small>הרגע שעזר</small><p>{scenario.moment.scene}</p></div>
-        <div className="bridge-case-summary-block"><small>איך השתנתה המסגרת?</small><p>{scenario.escapeRule}</p></div>
+        <div className="bridge-case-summary-block"><small>מה היה המלכוד, ואיך השתנתה המסגרת?</small><BridgeInsightMap scenario={scenario} phase="unlock" /></div>
         <div className="bridge-case-summary-block"><small>שאלת הגשר (אם מתאימה)</small><p>{scenario.bridgeOptions.find(o=>o.best)?.label}</p></div>
         <div className="bridge-case-summary-block"><small>מה השתנה לפי הדיווח שלו?</small><p>{scenario.difference}</p></div>
         <div className="bridge-case-pull"><span>לפני: {scenario.before}/10</span><span>אחרי: {scenario.after}/10</span></div>
